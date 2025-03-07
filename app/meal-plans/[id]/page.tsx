@@ -1,5 +1,3 @@
-"use client"
-
 import { AppSidebar } from "@/components/app-sidebar"
 import {
   Breadcrumb,
@@ -21,12 +19,10 @@ import { Button } from "@/components/ui/button"
 import { MealPlans } from "@/components/meal-plans"
 
 import mealPlans from "@/data/meal-plans.json"
-import { GetStaticPaths } from "next"
-import { useParams } from "next/navigation"
 
-export default function Page() {
-  const params = useParams()
-  const mealPlan = mealPlans.find(i => i.id === params.id)
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const mealPlan = mealPlans.find(i => i.id === id)
 
   const pageName = mealPlan?.name || "Not found"
 
@@ -81,13 +77,8 @@ export default function Page() {
   )
 }
 
-export const getStaticPaths = (async () => {
-  const paths = mealPlans.map(mealPlan => ({
-    params: { id: mealPlan.id }
+export async function generateStaticParams() {
+  return mealPlans.map(mealPlan => ({
+    id: mealPlan.id
   }))
-
-  return {
-    paths,
-    fallback: true, // false or "blocking"
-  }
-}) satisfies GetStaticPaths
+}

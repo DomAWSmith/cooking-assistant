@@ -1,5 +1,3 @@
-"use client"
-
 import { AppSidebar } from "@/components/app-sidebar"
 import {
   Breadcrumb,
@@ -21,13 +19,11 @@ import { Button } from "@/components/ui/button"
 import { Recipes } from "@/components/recipes"
 
 import recipes from "@/data/recipes.json"
-import { GetStaticPaths } from "next"
 import React from "react"
-import { useParams } from "next/navigation"
 
-export default function Page() {
-    const params = useParams()
-  const recipe = recipes.find(i => i.id === params.id)
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const recipe = recipes.find(i => i.id === id)
 
   const pageName = recipe?.name || "Not found"
 
@@ -82,13 +78,8 @@ export default function Page() {
   )
 }
 
-export const getStaticPaths = (async () => {
-  const paths = recipes.map(recipe => ({
-    params: { id: recipe.id }
+export async function generateStaticParams() {
+  return recipes.map(recipe => ({
+    id: recipe.id
   }))
-
-  return {
-    paths,
-    fallback: true, // false or "blocking"
-  }
-}) satisfies GetStaticPaths
+}

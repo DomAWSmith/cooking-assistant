@@ -43,6 +43,13 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  --color-protein: var(--protein);
+  --color-protein-foreground: var(--protein-foreground);
+  --color-fats: var(--fats);
+  --color-fats-foreground: var(--fats-foreground);
+  --color-carbs: var(--carbs);
+  --color-carbs-foreground: var(--carbs-foreground);
 }
 
 :root {
@@ -79,6 +86,13 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  --protein: oklch(73.02% 0.164 38.55);
+  --protein-foreground: oklch(23.93% 0 0);
+  --fats: oklch(87.41% 0.1514 88.01);
+  --fats-foreground: oklch(23.93% 0 0);
+  --carbs: oklch(70.56% 0.1437 160.79);
+  --carbs-foreground: oklch(23.93% 0 0);
 }
 
 .dark {
@@ -114,6 +128,13 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
+
+  --protein: oklch(0.41 0.11 46);
+  --protein-foreground: oklch(0.99 0.02 95);
+  --fats: oklch(0.41 0.11 46);
+  --fats-foreground: oklch(0.99 0.02 95);
+  --carbs: oklch(0.41 0.11 46);
+  --carbs-foreground: oklch(0.99 0.02 95);
 }
 
 @layer base {

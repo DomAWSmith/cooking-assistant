@@ -14,40 +14,32 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { Plus } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Flame, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { IMealPlan } from "@/types/IMealPlan"
-import { MealPlan } from "@/components/meal-plan"
 
-const mealPlans: IMealPlan[] = [
+const recipes = [
   {
     id: 1,
-    name: "Meal plan 1",
-    startDate: "5 Mar",
-    endDate: "10 Mar",
-    mealCount: 5
+    name: "Recipe 1",
+    date: "Yesterday",
+    calories: 415,
+    carbs: 15,
+    fats: 5.2,
+    protein: 10,
   },
   {
     id: 2,
-    name: "Meal plan 2",
-    startDate: "15 Feb",
-    endDate: "20 Feb",
-    mealCount: 3
-  },
-  {
-    id: 3,
-    name: "Meal plan 3",
-    startDate: "5 Feb",
-    endDate: "10 Feb",
-    mealCount: 4
+    name: "Recipe 2",
+    date: "A week ago",
+    calories: 244,
+    carbs: 40,
+    fats: 40,
+    protein: 20.2,
   }
 ];
 
-export default function MealPlans() {
-
-  const activePlans = [mealPlans[0]];
-  const inactivePlans = [mealPlans[1], mealPlans[2]];
-
+export default function Recipes() {
   return (
     <SidebarProvider
       style={
@@ -56,12 +48,12 @@ export default function MealPlans() {
         } as React.CSSProperties
       }
     >
-      <AppSidebar
+      <AppSidebar 
         listHeader={(
           <>
             <div className="flex w-full items-center justify-between">
               <div className="text-foreground text-base font-medium">
-                Meal plans
+                Recipes
               </div>
 
               <div className="flex items-center gap-2 text-sm">
@@ -76,16 +68,27 @@ export default function MealPlans() {
         list={(
           <>
             {
-              activePlans.map((mealPlan) => <MealPlan key={mealPlan.id} {...mealPlan} />)
+              recipes.map((recipe) => (
+                <a
+                  href="#"
+                  key={recipe.id}
+                  className="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap last:border-b-0"
+                >
+                  <div className="flex w-full items-center gap-2">
+                    <span>{recipe.name}</span>{" "}
+                    <span className="ml-auto text-xs">{recipe.date}</span>
+                  </div>
+                  <div className="flex w-full gap-2 pt-2">
+                    <Badge className="font-mono font-light" variant="outline">{recipe.calories} <Flame /></Badge>
+                    <div className="flex gap-2 ml-auto">
+                      <Badge className="font-mono font-light bg-protein text-protein-foreground">{recipe.protein} P</Badge>
+                      <Badge className="font-mono font-light bg-fats text-fats-foreground">{recipe.fats} F</Badge>
+                      <Badge className="font-mono font-light bg-carbs text-carbs-foreground">{recipe.carbs} C</Badge>
+                    </div>
+                  </div>
+                </a>
+              ))
             }
-            {inactivePlans.length > 0 && (
-              <>
-                <div className="text-center border-b pt-24 pb-4 mt-auto">Past plans</div>
-                {
-                  inactivePlans.map((mealPlan) => <MealPlan key={mealPlan.id} {...mealPlan} />)
-                }
-              </>
-            )}
           </>
         )}
       />
@@ -96,17 +99,16 @@ export default function MealPlans() {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="md:hidden">
-                <BreadcrumbPage className="flex items-center">Meal plans</BreadcrumbPage>
+                <BreadcrumbPage className="flex items-center">Recipes</BreadcrumbPage>
               </BreadcrumbItem>
 
               {/* <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="#">All meal plans</BreadcrumbLink>
+                <BreadcrumbLink href="#">All Recipes</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem>
-                <BreadcrumbPage className="flex items-center">5 Mar to 10 Mar</BreadcrumbPage>
+                <BreadcrumbPage>Recipe #1</BreadcrumbPage>
               </BreadcrumbItem> */}
-
             </BreadcrumbList>
           </Breadcrumb>
         </header>

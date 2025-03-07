@@ -4,6 +4,7 @@ import {
     BreadcrumbItem,
     BreadcrumbList,
     BreadcrumbPage,
+    BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
 import {
@@ -21,9 +22,11 @@ import { ReactNode } from "react"
 
 interface Props {
     children: ReactNode
+    breadcrumbs: ReactNode
+    showMobileAddNew?: boolean
 }
 
-export default function RecipeSidebar({ children }: Props) {
+export default function RecipeSidebar({ children, breadcrumbs, showMobileAddNew }: Props) {
     return (
         <SidebarProvider
             style={
@@ -56,12 +59,16 @@ export default function RecipeSidebar({ children }: Props) {
                     <SidebarTrigger className="-ml-1" />
                     <Separator orientation="vertical" className="mr-2 h-4" />
                     <Breadcrumb>
-                        <BreadcrumbList>
-                            <BreadcrumbItem className="md:hidden">
-                                <BreadcrumbPage className="flex items-center">Recipes</BreadcrumbPage>
-                            </BreadcrumbItem>
+                        <BreadcrumbList className="md:hidden">
+                            {breadcrumbs}
                         </BreadcrumbList>
                     </Breadcrumb>
+
+                    <div className={`ml-auto pl-2 md:hidden ${showMobileAddNew ? "" : "opacity-0 pointer-events-none"}`}>
+                        <Button className="text-xs" tabIndex={showMobileAddNew ? 1 : 0}>
+                            <Plus /> Add new
+                        </Button>
+                    </div>
                 </header>
                 {children}
             </SidebarInset>

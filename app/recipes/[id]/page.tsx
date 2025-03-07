@@ -1,3 +1,5 @@
+"use client"
+
 import { AppSidebar } from "@/components/app-sidebar"
 import {
   Breadcrumb,
@@ -20,9 +22,12 @@ import { Recipes } from "@/components/recipes"
 
 import recipes from "@/data/recipes.json"
 import { GetStaticPaths } from "next"
+import React from "react"
+import { useParams } from "next/navigation"
 
-export default function Page({ params }: { params: { id: string } }) {
-  const recipe = recipes.find(i => i.id === params.id);
+export default function Page() {
+    const params = useParams()
+  const recipe = recipes.find(i => i.id === params.id)
 
   const pageName = recipe?.name || "Not found"
 

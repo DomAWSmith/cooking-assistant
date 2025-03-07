@@ -1,3 +1,5 @@
+"use client"
+
 import { AppSidebar } from "@/components/app-sidebar"
 import {
   Breadcrumb,
@@ -20,9 +22,11 @@ import { MealPlans } from "@/components/meal-plans"
 
 import mealPlans from "@/data/meal-plans.json"
 import { GetStaticPaths } from "next"
+import { useParams } from "next/navigation"
 
-export default function Page({ params }: { params: { id: string } }) {
-  const mealPlan = mealPlans.find(i => i.id === params.id);
+export default function Page() {
+  const params = useParams()
+  const mealPlan = mealPlans.find(i => i.id === params.id)
 
   const pageName = mealPlan?.name || "Not found"
 

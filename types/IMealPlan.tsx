@@ -1,7 +1,9 @@
 export interface IMealPlan {
-    id: number
+    id: string
     name: string
     startDate: string
     endDate: string
     mealCount: number
+    currentIngredientCount: number
+    totalIngredientCount: number
 }

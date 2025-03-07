@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/sidebar"
 
 import { usePathname } from 'next/navigation'
+import Link from "next/link"
 
 // This is sample data
 const data = {
@@ -29,7 +30,7 @@ const data = {
   navMain: [
     {
       title: "Meal plans",
-      url: "/",
+      url: "/meal-plans",
       icon: NotebookPen,
       isActive: false,
     },
@@ -43,14 +44,16 @@ const data = {
 }
 
 interface Props extends React.ComponentProps<typeof Sidebar> {
-  listHeader: React.ReactNode
-  list: React.ReactNode
+  listHeader?: React.ReactNode
+  list?: React.ReactNode
 }
 
 export function AppSidebar({ listHeader, list, ...props }: Props) {
   const pathname = usePathname()
   
   const { setOpen } = useSidebar()
+
+  const showSecondarySideBar = listHeader !== undefined || list !== undefined
 
   return (
     <Sidebar
@@ -69,7 +72,7 @@ export function AppSidebar({ listHeader, list, ...props }: Props) {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton size="lg" asChild className="md:h-8 md:p-0">
-                <a href="#">
+                <Link href="/">
                   <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                     <Command className="size-4" />
                   </div>
@@ -77,7 +80,7 @@ export function AppSidebar({ listHeader, list, ...props }: Props) {
                     <span className="truncate font-medium">Cooking Assistant</span>
                     <span className="truncate text-xs">Free</span>
                   </div>
-                </a>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -98,10 +101,10 @@ export function AppSidebar({ listHeader, list, ...props }: Props) {
                       className="px-2.5 md:px-2"
                       asChild
                     >
-                      <a href={item.url}>
+                      <Link href={item.url}>
                         <item.icon />
                         <span>{item.title}</span>
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
@@ -116,18 +119,20 @@ export function AppSidebar({ listHeader, list, ...props }: Props) {
 
       {/* This is the second sidebar */}
       {/* We disable collapsible and let it fill remaining space */}
-      <Sidebar collapsible="none" className="hidden flex-1 md:flex">
-        <SidebarHeader className="gap-3.5 border-b p-4">
-          {listHeader}
-        </SidebarHeader>
-        <SidebarContent>
-          <SidebarGroup className="px-0 flex flex-col h-full">
-            <SidebarGroupContent className="flex flex-col h-full">
-              {list}
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarContent>
-      </Sidebar>
+      {showSecondarySideBar && (
+        <Sidebar collapsible="none" className="hidden flex-1 md:flex">
+          <SidebarHeader className="gap-3.5 border-b p-4">
+            {listHeader}
+          </SidebarHeader>
+          <SidebarContent>
+            <SidebarGroup className="px-0 flex flex-col h-full">
+              <SidebarGroupContent className="flex flex-col h-full">
+                {list}
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarContent>
+        </Sidebar>
+      )}
     </Sidebar>
   )
 }

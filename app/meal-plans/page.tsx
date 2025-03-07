@@ -14,9 +14,9 @@ import {
 } from "@/components/ui/sidebar"
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { MealPlans } from "@/components/meal-plans"
 
-import recipes from "@/data/recipes.json"
-import { Recipes } from "@/components/recipes"
+import mealPlans from "@/data/meal-plans.json"
 
 export default function Page() {
   return (
@@ -27,12 +27,12 @@ export default function Page() {
         } as React.CSSProperties
       }
     >
-      <AppSidebar 
+      <AppSidebar
         listHeader={(
           <>
             <div className="flex w-full items-center justify-between">
               <div className="text-foreground text-base font-medium mr-2 flex-shrink-0">
-                Recipes
+                Meal plans
               </div>
 
               <div className="flex items-center gap-2 text-sm">
@@ -44,7 +44,7 @@ export default function Page() {
             <SidebarInput placeholder="Type to search..." />
           </>
         )}
-        list={<Recipes recipes={recipes} />}
+        list={<MealPlans mealPlans={mealPlans} />}
       />
       <SidebarInset>
         <header className="sticky top-0 flex shrink-0 items-center gap-2 border-b bg-background p-4">
@@ -53,13 +53,13 @@ export default function Page() {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="md:hidden">
-                <BreadcrumbPage className="flex items-center">Recipes</BreadcrumbPage>
+                <BreadcrumbPage className="flex items-center">Meal plans</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </header>
         <div className="md:hidden">
-          <Recipes recipes={recipes} />
+          <MealPlans mealPlans={mealPlans} />
         </div>
       </SidebarInset>
     </SidebarProvider>

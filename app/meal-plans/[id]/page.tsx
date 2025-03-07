@@ -2,8 +2,10 @@ import { AppSidebar } from "@/components/app-sidebar"
 import {
   Breadcrumb,
   BreadcrumbItem,
+  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
+  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
 import {
@@ -14,11 +16,16 @@ import {
 } from "@/components/ui/sidebar"
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { MealPlans } from "@/components/meal-plans"
 
-import recipes from "@/data/recipes.json"
-import { Recipes } from "@/components/recipes"
+import mealPlans from "@/data/meal-plans.json"
+import { GetStaticPaths } from "next"
 
-export default function Page() {
+export default function Page({ params }: { params: { id: string } }) {
+  const mealPlan = mealPlans.find(i => i.id === params.id);
+
+  const pageName = mealPlan?.name || "Not found"
+
   return (
     <SidebarProvider
       style={
@@ -27,16 +34,16 @@ export default function Page() {
         } as React.CSSProperties
       }
     >
-      <AppSidebar 
+      <AppSidebar
         listHeader={(
           <>
             <div className="flex w-full items-center justify-between">
               <div className="text-foreground text-base font-medium mr-2 flex-shrink-0">
-                Recipes
+                Meal plans
               </div>
 
               <div className="flex items-center gap-2 text-sm">
-                <Button>
+                <Button className="text-sm">
                   <Plus /> Add new
                 </Button>
               </div>
@@ -44,7 +51,7 @@ export default function Page() {
             <SidebarInput placeholder="Type to search..." />
           </>
         )}
-        list={<Recipes recipes={recipes} />}
+        list={<MealPlans mealPlans={mealPlans} />}
       />
       <SidebarInset>
         <header className="sticky top-0 flex shrink-0 items-center gap-2 border-b bg-background p-4">
@@ -53,15 +60,30 @@ export default function Page() {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="md:hidden">
-                <BreadcrumbPage className="flex items-center">Recipes</BreadcrumbPage>
+                <BreadcrumbLink href="/meal-plans">Meal plans</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator className="md:hidden" />
+              <BreadcrumbItem>
+                <BreadcrumbPage className="flex items-center">{pageName}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </header>
-        <div className="md:hidden">
-          <Recipes recipes={recipes} />
+        <div className="flex flex-1 flex-col gap-4">
+          <div>{pageName}</div>
         </div>
       </SidebarInset>
     </SidebarProvider>
   )
 }
+
+export const getStaticPaths = (async () => {
+  const paths = mealPlans.map(mealPlan => ({
+    params: { id: mealPlan.id }
+  }))
+
+  return {
+    paths,
+    fallback: true, // false or "blocking"
+  }
+}) satisfies GetStaticPaths

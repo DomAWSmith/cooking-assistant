@@ -1,4 +1,5 @@
 import { AppSidebar } from "@/components/app-sidebar"
+import Chef from "@/components/chef";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
 import {
@@ -9,6 +10,21 @@ import {
 } from "@/components/ui/sidebar"
 
 export default function MealPlans() {
+
+  const date = new Date()
+  const formatter = new Intl.DateTimeFormat("en-GB", { dateStyle: "long" })
+  const formattedDate = formatter.format(date)
+
+  const hour = date.getHours()
+  let welcomeMessage = ""
+  if (hour < 12) {
+    welcomeMessage = "Good morning"
+  } else if (hour < 16) {
+    welcomeMessage = "Good afternoon"
+  } else if (hour < 24) {
+    welcomeMessage = "Good evening"
+  }
+
   return (
     <SidebarProvider
       style={
@@ -19,7 +35,7 @@ export default function MealPlans() {
     >
       <AppSidebar />
       <SidebarInset>
-        <header className="sticky top-0 flex shrink-0 items-center gap-2 border-b bg-background p-4">
+        <header className="md:hidden sticky top-0 flex shrink-0 items-center gap-2 border-b bg-background p-4">
           <SidebarTrigger className="-ml-1 md:hidden" />
           <Separator orientation="vertical" className="mr-2 h-4 md:hidden" />
           <Breadcrumb>
@@ -30,8 +46,16 @@ export default function MealPlans() {
             </BreadcrumbList>
           </Breadcrumb>
         </header>
-        <div className="flex flex-1 flex-col gap-4">
-          {<>Welcome</>}
+        <div className="flex h-full w-full items-center justify-center p-4">
+          <div className="flex flex-col items-center justify-center">
+            <Chef className="mb-4 -ml-4" />
+            <div className="relative">
+              <div className="bg-black w-4 h-4 absolute bottom-full left-1/2 -translate-x-1/2 translate-y-1/2 rotate-45 " />
+              <div className="bg-black ml-2 px-4 py-2 text-white rounded-lg text-lg">
+                {welcomeMessage}! It's {formattedDate}, you have no meals planned this at the moment
+              </div>
+            </div>
+          </div>
         </div>
       </SidebarInset>
     </SidebarProvider>

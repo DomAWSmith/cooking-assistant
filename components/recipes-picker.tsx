@@ -35,12 +35,12 @@ export function RecipesPicker({ recipeIds, onSave }: Props) {
             <DialogTrigger asChild>
                 <Button className="w-full">
                     <CookingPot />
-                    <span>{recipeIds.length > 0 ? `${recipeIds.length} ${recipeIds.length === 1 ? "recipe" : "recipes"} chosen` : "Choose recipes"}</span>
+                    <span>{recipeIds.length > 0 ? `${recipeIds.length} ${recipeIds.length === 1 ? "recipe" : "recipes"} added` : "Add recipes"}</span>
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] overflow-y-scroll max-h-[90vh]">
                 <DialogHeader>
-                    <DialogTitle>Choose recipes</DialogTitle>
+                    <DialogTitle>Add recipes</DialogTitle>
                     <DialogDescription>
                         Select the recipes you'd like to include in your meal plan
                     </DialogDescription>
@@ -55,7 +55,7 @@ export function RecipesPicker({ recipeIds, onSave }: Props) {
                 </ScrollArea>
 
                 <DialogFooter>
-                    <Button type="submit" onClick={onSubmit}>Choose ({selectedRecipeIds.length})</Button>
+                    <Button type="submit" onClick={onSubmit}>Add ({selectedRecipeIds.length})</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

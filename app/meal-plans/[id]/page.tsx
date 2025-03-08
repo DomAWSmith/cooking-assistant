@@ -10,6 +10,7 @@ import { addDays } from "date-fns"
 import { mealPlanDateRangeChanged, mealPlanRenamed } from "@/app/reducers/mealPlansSlice"
 import { RecipesPicker } from "@/components/recipes-picker"
 import { useState } from "react"
+import MealPlanOrganiser from "@/components/meal-plan-organiser"
 
 export default function Page() {
   const { id } = useParams<{ id: string }>()
@@ -17,6 +18,7 @@ export default function Page() {
   const dispatch = useAppDispatch();
 
   const mealPlan = useAppSelector(state => state.mealPlans.find(i => i.id === id))
+  const recipes = useAppSelector(state => state.recipes)
 
   const pageName = mealPlan?.title || "Not found"
 
@@ -78,8 +80,9 @@ export default function Page() {
       </div>
 
       <div className="p-4">
-        <div>Meals</div>
-
+        <MealPlanOrganiser 
+          recipes={recipes.filter(recipe => recipeIds.includes(recipe.id))} 
+        />
       </div>
     </MealPlanSidebar>
   )

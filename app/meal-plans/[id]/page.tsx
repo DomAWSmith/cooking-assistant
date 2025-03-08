@@ -2,32 +2,64 @@
 
 import MealPlanSidebar from "@/components/meal-plan-sidebar"
 import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb"
-import { useAppSelector } from "@/lib/hooks"
+import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { useParams } from "next/navigation"
+import DialogRename from "@/components/dialog-rename"
+import { DatePickerWithRange } from "@/components/date-picker-with-range"
+import { addDays } from "date-fns"
+import { mealPlanRenamed } from "@/app/reducers/mealPlansSlice"
 
 export default function Page() {
   const { id } = useParams<{ id: string }>()
 
+  const dispatch = useAppDispatch();
+
   const mealPlan = useAppSelector(state => state.mealPlans.find(i => i.id === id))
 
-  const pageName = mealPlan?.name || "Not found"
+  const pageName = mealPlan?.title || "Not found"
+
+  const tomorrow = addDays(new Date(), 1)
+  tomorrow.setHours(0, 0, 0, 0)
+  const nextWeek = addDays(new Date(), 7)
+  nextWeek.setHours(0, 0, 0, 0)
+
+  let startDate = tomorrow
+  let endDate = nextWeek
+  if (mealPlan) {
+    startDate = new Date(mealPlan.startDate)
+    endDate = new Date(mealPlan.endDate)
+  }
 
   return (
     <MealPlanSidebar
       breadcrumbs={
         <>
-          <BreadcrumbItem>
+          <BreadcrumbItem className="md:hidden">
             <BreadcrumbLink href="/meal-plans" className="flex items-center">Meal plans</BreadcrumbLink>
           </BreadcrumbItem>
-          <BreadcrumbSeparator />
+          <BreadcrumbSeparator className="md:hidden" />
           <BreadcrumbItem>
-            <BreadcrumbPage className="flex items-center">{pageName}</BreadcrumbPage>
+            <BreadcrumbPage className="flex items-center">
+              <DialogRename 
+                originalTitle={pageName}
+                onSave={(title) => {
+                  dispatch(mealPlanRenamed({ id, title }))
+                }}
+              />
+            </BreadcrumbPage>
           </BreadcrumbItem>
         </>
       }
     >
       <div className="flex flex-1 flex-col gap- p-4">
-        <div>{pageName}</div>
+        <div className="flex items-center">
+          <div className="w-full md:ml-auto md:w-auto">
+            <DatePickerWithRange 
+              fromDate={startDate}
+              toDate={endDate}
+            />
+          </div>
+        </div>
       </div>
     </MealPlanSidebar>
   )

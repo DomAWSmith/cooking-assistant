@@ -12,7 +12,7 @@ export default function Page() {
     <MealPlanSidebar 
       breadcrumbs={
         <>
-          <BreadcrumbItem>
+          <BreadcrumbItem className="md:hidden">
             <BreadcrumbPage className="flex items-center">Meal plans</BreadcrumbPage>
           </BreadcrumbItem>
         </>

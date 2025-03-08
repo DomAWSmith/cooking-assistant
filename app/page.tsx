@@ -19,7 +19,7 @@ export default function MealPlans() {
 
   const nextMealPlans = mealPlans
     .slice()
-    .sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
+    .sort((a, b) => a.startDate - b.startDate)
 
   return (
     <SidebarProvider
@@ -31,7 +31,7 @@ export default function MealPlans() {
     >
       <AppSidebar />
       <SidebarInset>
-        <header className="md:hidden sticky top-0 flex shrink-0 items-center gap-2 border-b bg-background p-4">
+        <header className="md:hidden sticky top-0 flex shrink-0 items-center gap-2 border-b bg-background p-4 h-18">
           <SidebarTrigger className="-ml-1 md:hidden" />
           <Separator orientation="vertical" className="mr-2 h-4 md:hidden" />
           <Breadcrumb>

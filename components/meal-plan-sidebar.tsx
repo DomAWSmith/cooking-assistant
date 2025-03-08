@@ -56,11 +56,11 @@ export default function MealPlanSidebar({ children, breadcrumbs, showMobileAddNe
                 list={<MealPlans mealPlans={mealPlans} />}
             />
             <SidebarInset>
-                <header className="sticky top-0 flex shrink-0 items-center gap-2 border-b bg-background p-4">
+                <header className="sticky top-0 flex shrink-0 items-center gap-2 border-b bg-background p-4 h-18">
                     <SidebarTrigger className="-ml-1" />
                     <Separator orientation="vertical" className="mr-2 h-4" />
                     <Breadcrumb>
-                        <BreadcrumbList className="md:hidden">
+                        <BreadcrumbList>
                             {breadcrumbs}
                         </BreadcrumbList>
                     </Breadcrumb>

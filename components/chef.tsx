@@ -35,10 +35,10 @@ export default function Chef({ hasRecipes, nextMealPlan }: Props) {
         actionLink = `/meal-plans/${nextMealPlan.id}`
         actionLabel = "View meal plan"
 
-        if (isAfterToday(now, nextMealPlan.startDate)) {
-            actionMessage = `You have ${nextMealPlan.name}</strong> ${relativeDate(now, nextMealPlan.startDate)}`
+        if (isAfterToday(now, new Date(nextMealPlan.startDate))) {
+            actionMessage = `You have ${nextMealPlan.title}</strong> ${relativeDate(now, new Date(nextMealPlan.startDate))}`
         } else {
-            actionMessage = `You currently have <strong>${nextMealPlan.name}</strong> ending ${relativeDate(now, nextMealPlan.endDate)}`
+            actionMessage = `You currently have <strong>${nextMealPlan.title}</strong> ending ${relativeDate(now, new Date(nextMealPlan.endDate))}`
         }
     } else {
         actionLink = `/meal-plans/create`

@@ -38,7 +38,7 @@ export function RecipesPicker({ recipeIds, onSave }: Props) {
                     <span>{recipeIds.length > 0 ? `${recipeIds.length} ${recipeIds.length === 1 ? "recipe" : "recipes"} chosen` : "Choose recipes"}</span>
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px] overflow-y-scroll max-h-[90vh]">
                 <DialogHeader>
                     <DialogTitle>Choose recipes</DialogTitle>
                     <DialogDescription>

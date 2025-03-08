@@ -50,7 +50,7 @@ export default function DialogRename({ originalTitle, onSave }: Props) {
                     <Pencil size={16} className="ml-2" />
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px] overflow-y-scroll max-h-[90vh]">
                 <DialogHeader>
                     <DialogTitle>Rename "{originalTitle}"</DialogTitle>
                 </DialogHeader>

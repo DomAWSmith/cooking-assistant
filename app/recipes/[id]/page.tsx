@@ -1,10 +1,14 @@
-import recipes from "@/data/recipes.json"
+"use client"
+
 import RecipeSidebar from "@/components/recipe-sidebar"
 import { BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
+import { useAppSelector } from "@/lib/hooks"
+import { useParams } from "next/navigation"
 
-export default async function Page({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
-  const recipe = recipes.find(i => i.id === id)
+export default function Page() {
+  const { id } = useParams<{ id: string }>()
+
+  const recipe = useAppSelector(state => state.recipes.find(i => i.id === id))
 
   const pageName = recipe?.name || "Not found"
 
@@ -27,10 +31,4 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       </div>
     </RecipeSidebar>
   )
-}
-
-export async function generateStaticParams() {
-  return recipes.map(recipe => ({
-    id: recipe.id
-  }))
 }

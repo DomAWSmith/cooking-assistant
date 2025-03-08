@@ -1,3 +1,7 @@
+"use client"
+
+import { useAppSelector } from "@/lib/hooks"
+
 import { AppSidebar } from "@/components/app-sidebar"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
@@ -9,10 +13,13 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 
-import recipes from "@/data/recipes.json"
-import mealPlans from "@/data/meal-plans"
-
 export default function MealPlans() {
+  const mealPlans = useAppSelector(state => state.mealPlans)
+  const recipes = useAppSelector(state => state.recipes)
+
+  const nextMealPlans = mealPlans
+    .slice()
+    .sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
 
   return (
     <SidebarProvider
@@ -37,8 +44,8 @@ export default function MealPlans() {
         </header>
         <div className="flex h-full w-full items-center justify-center p-4">
           <Chef 
-            hasRecipes={true}
-            nextMealPlan={mealPlans[0]} 
+            hasRecipes={recipes.length > 0}
+            nextMealPlan={nextMealPlans[0] || null} 
           />
         </div>
       </SidebarInset>

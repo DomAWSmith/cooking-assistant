@@ -1,3 +1,5 @@
+"use client"
+
 import { AppSidebar } from "@/components/app-sidebar"
 import {
     Breadcrumb,
@@ -14,8 +16,8 @@ import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { MealPlans } from "@/components/meal-plans"
 
-import mealPlans from "@/data/meal-plans"
 import { ReactNode } from "react"
+import { useAppSelector } from "@/lib/hooks"
 
 interface Props {
     children: ReactNode
@@ -24,6 +26,8 @@ interface Props {
 }
 
 export default function MealPlanSidebar({ children, breadcrumbs, showMobileAddNew }: Props) {
+    const mealPlans = useAppSelector(state => state.mealPlans)
+    
     return (
         <SidebarProvider
             style={

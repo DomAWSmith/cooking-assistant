@@ -1,10 +1,9 @@
+"use client"
+
 import { AppSidebar } from "@/components/app-sidebar"
 import {
     Breadcrumb,
-    BreadcrumbItem,
     BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
 import {
@@ -16,9 +15,9 @@ import {
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-import recipes from "@/data/recipes.json"
 import { Recipes } from "@/components/recipes"
 import { ReactNode } from "react"
+import { useAppSelector } from "@/lib/hooks"
 
 interface Props {
     children: ReactNode
@@ -27,6 +26,8 @@ interface Props {
 }
 
 export default function RecipeSidebar({ children, breadcrumbs, showMobileAddNew }: Props) {
+    const recipes = useAppSelector(state => state.recipes)
+
     return (
         <SidebarProvider
             style={

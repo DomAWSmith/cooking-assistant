@@ -56,7 +56,6 @@ export default function Page() {
       }
     >
       <div className="flex gap-4 p-4">
-
         <div>
           <RecipesPicker
             recipeIds={recipeIds}
@@ -76,6 +75,10 @@ export default function Page() {
             }}
           />
         </div>
+      </div>
+
+      <div className="p-4">
+        <div>Meals</div>
 
       </div>
     </MealPlanSidebar>

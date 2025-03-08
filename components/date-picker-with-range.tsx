@@ -15,9 +15,10 @@ import {
 interface Props {
     fromDate: Date,
     toDate: Date
+    onSave: (fromDate: Date, toDate: Date) => void
 }
 
-export function DatePickerWithRange({ fromDate, toDate }: Props) {
+export function DatePickerWithRange({ fromDate, toDate, onSave }: Props) {
     const [date, setDate] = useState<DateRange | undefined>({
         from: fromDate,
         to: toDate,
@@ -25,7 +26,12 @@ export function DatePickerWithRange({ fromDate, toDate }: Props) {
 
     return (
         <div className={cn("grid gap-2")}>
-            <Popover>
+            <Popover onOpenChange={(isOpen) => {
+                if (isOpen) return
+                if (!date || !date.from || !date.to) return
+
+                onSave(date.from, date.to)
+            }}>
                 <PopoverTrigger asChild>
                     <Button
                         id="date"

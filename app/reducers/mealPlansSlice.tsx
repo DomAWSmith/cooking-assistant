@@ -59,8 +59,15 @@ const mealPlansSlice = createSlice({
                 title,
             } : mealPlan)
         },
+        mealPlanDateRangeChanged: (state, { payload: { id, startDate, endDate } }: PayloadAction<{ id: string, startDate: number, endDate: number }>) => {
+            return state.map(mealPlan => mealPlan.id === id ? {
+                ...mealPlan,
+                startDate,
+                endDate,
+            } : mealPlan)
+        },
     }
 })
 
-export const { mealPlanAdded, mealPlanRenamed } = mealPlansSlice.actions
+export const { mealPlanAdded, mealPlanRenamed, mealPlanDateRangeChanged } = mealPlansSlice.actions
 export default mealPlansSlice.reducer

@@ -7,7 +7,7 @@ import { useParams } from "next/navigation"
 import DialogRename from "@/components/dialog-rename"
 import { DatePickerWithRange } from "@/components/date-picker-with-range"
 import { addDays } from "date-fns"
-import { mealPlanRenamed } from "@/app/reducers/mealPlansSlice"
+import { mealPlanDateRangeChanged, mealPlanRenamed } from "@/app/reducers/mealPlansSlice"
 
 export default function Page() {
   const { id } = useParams<{ id: string }>()
@@ -57,6 +57,13 @@ export default function Page() {
             <DatePickerWithRange 
               fromDate={startDate}
               toDate={endDate}
+              onSave={(startDate, endDate) => {
+                dispatch(mealPlanDateRangeChanged({ 
+                  id, 
+                  startDate: startDate.getTime(), 
+                  endDate: endDate.getTime() 
+                }))
+              }}
             />
           </div>
         </div>

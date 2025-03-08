@@ -25,7 +25,7 @@ export function RecipeSelect({ recipes, selectedIds, onSelect }: Props) {
   return (
     <>
       {recipes.map((recipe) => (
-        <button
+        <div
           key={recipe.id}
           onClick={() => toggleSelect(recipe.id)}
           className="w-full text-sidebar-accent-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-row items-center gap-2 border-b text-sm leading-tight whitespace-nowrap last:border-b-0"
@@ -36,7 +36,7 @@ export function RecipeSelect({ recipes, selectedIds, onSelect }: Props) {
           <div className="flex w-full flex-col items-start gap-2 pl-2 p-4">
             <Recipe {...recipe} />
           </div>
-        </button>
+        </div>
       ))}
     </>
   )

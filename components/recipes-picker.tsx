@@ -46,7 +46,7 @@ export function RecipesPicker({ recipeIds, onSave }: Props) {
                     </DialogDescription>
                 </DialogHeader>
 
-                <ScrollArea className="h-[400px] rounded-md border">
+                <ScrollArea className="max-h-[400px] rounded-md border">
                     <RecipeSelect 
                         recipes={recipes} 
                         selectedIds={selectedRecipeIds}

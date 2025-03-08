@@ -1,22 +1,28 @@
-import { ReactNode } from "react"
 import { useDraggable } from "@dnd-kit/core"
+import { IRecipe } from "@/types/IRecipe"
+import { RecipeDraggable } from "./recipe-draggable"
 
 interface Props {
-    id: string
-    children: ReactNode
+    recipe: IRecipe
 }
 
-export default function MealPlanOrganiserDragger({ id, children }: Props) {
-    const { attributes, listeners, setNodeRef, transform } = useDraggable({
-        id,
+export default function MealPlanOrganiserDragger({ recipe }: Props) {
+    const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+        id: recipe.id,
     })
     const style = transform ? {
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
     } : undefined
 
     return (
-        <button ref={setNodeRef} style={style} {...listeners} {...attributes} className="p-4 bg-black/50">
-            {children}
+        <button 
+            ref={setNodeRef} 
+            style={style} 
+            {...listeners} 
+            {...attributes} 
+            className={`${isDragging ? "rounded overflow-hidden outline outline-black/10" : "border-b last:border-b-0"}`}
+        >
+            <RecipeDraggable {...recipe} />
         </button>
     )
 }

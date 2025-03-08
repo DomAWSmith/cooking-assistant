@@ -8,8 +8,7 @@ import { useParams } from "next/navigation"
 export default function Page() {
   const { id } = useParams<{ id: string }>()
 
-  const mealPlans = useAppSelector(state => state.mealPlans)
-  const mealPlan = mealPlans.find(i => i.id === id)
+  const mealPlan = useAppSelector(state => state.mealPlans.find(i => i.id === id))
 
   const pageName = mealPlan?.name || "Not found"
 

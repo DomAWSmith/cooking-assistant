@@ -89,25 +89,29 @@ export function AppSidebar({ listHeader, list, ...props }: Props) {
           <SidebarGroup>
             <SidebarGroupContent className="px-1.5 md:px-0">
               <SidebarMenu>
-                {data.navMain.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      tooltip={{
-                        children: item.title,
-                        hidden: false,
-                      }}
-                      onClick={() => setOpen(true)}
-                      isActive={pathname === item.url}
-                      className="px-2.5 md:px-2"
-                      asChild
-                    >
-                      <Link href={item.url}>
-                        <item.icon />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                {data.navMain.map((item) => {
+                  const isActive = pathname.startsWith(item.url)
+
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton
+                        tooltip={{
+                          children: item.title,
+                          hidden: false,
+                        }}
+                        onClick={() => setOpen(true)}
+                        isActive={isActive}
+                        className={`px-2.5 md:px-2 ${isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""}`}
+                        asChild
+                      >
+                        <Link href={item.url}>
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )
+                })}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

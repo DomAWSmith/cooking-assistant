@@ -1,4 +1,4 @@
-import mealPlans from "@/data/meal-plans.json"
+import mealPlans from "@/data/meal-plans"
 import MealPlanSidebar from "@/components/meal-plan-sidebar"
 import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb"
 
@@ -22,7 +22,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         </>
       }
     >
-      <div className="flex flex-1 flex-col gap-4">
+      <div className="flex flex-1 flex-col gap- p-4">
         <div>{pageName}</div>
       </div>
     </MealPlanSidebar>

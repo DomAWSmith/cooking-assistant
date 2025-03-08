@@ -1,5 +1,5 @@
 import { MealPlans } from "@/components/meal-plans"
-import mealPlans from "@/data/meal-plans.json"
+import mealPlans from "@/data/meal-plans"
 import MealPlanSidebar from "@/components/meal-plan-sidebar"
 import { BreadcrumbItem, BreadcrumbPage } from "@/components/ui/breadcrumb"
 
@@ -15,7 +15,7 @@ export default function Page() {
       }
       showMobileAddNew={true}
     >
-      <div className="md:hidden">
+      <div className="md:hidden flex flex-col h-full">
         <MealPlans mealPlans={mealPlans} />
       </div>
     </MealPlanSidebar>

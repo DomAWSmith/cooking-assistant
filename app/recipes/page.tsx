@@ -15,7 +15,7 @@ export default function Page() {
       }
       showMobileAddNew={true}
     >
-      <div className="md:hidden">
+      <div className="md:hidden flex flex-col h-full">
         <Recipes recipes={recipes} />
       </div>
     </RecipeSidebar>

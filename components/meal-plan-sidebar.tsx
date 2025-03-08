@@ -1,9 +1,7 @@
 import { AppSidebar } from "@/components/app-sidebar"
 import {
     Breadcrumb,
-    BreadcrumbItem,
     BreadcrumbList,
-    BreadcrumbPage,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
 import {
@@ -16,7 +14,7 @@ import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { MealPlans } from "@/components/meal-plans"
 
-import mealPlans from "@/data/meal-plans.json"
+import mealPlans from "@/data/meal-plans"
 import { ReactNode } from "react"
 
 interface Props {

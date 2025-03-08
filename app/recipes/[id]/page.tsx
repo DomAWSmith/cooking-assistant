@@ -22,7 +22,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         </>
       }
     >
-      <div className="flex flex-1 flex-col gap-4">
+      <div className="flex flex-1 flex-col gap-4 p-4">
         <div>{pageName}</div>
       </div>
     </RecipeSidebar>

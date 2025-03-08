@@ -81,7 +81,7 @@ export default function MealPlans() {
             <div className="relative mb-4">
               <div className="bg-black w-4 h-4 absolute bottom-full left-1/2 -translate-x-1/2 translate-y-1/2 rotate-45 " />
               <div className="bg-black ml-2 px-4 py-2 text-white rounded-lg text-lg">
-                {welcomeMessage}! It's {formattedDate}, {actionMessage}.
+                {welcomeMessage}! It's {formattedDate}, and {actionMessage}.
               </div>
             </div>
             <Button variant="outline" asChild>

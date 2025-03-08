@@ -36,9 +36,9 @@ export default function Chef({ hasRecipes, nextMealPlan }: Props) {
         actionLabel = "View meal plan"
 
         if (isAfterToday(now, nextMealPlan.startDate)) {
-            actionMessage = `You have "${nextMealPlan.name}" ${relativeDate(now, nextMealPlan.startDate)}`
+            actionMessage = `You have ${nextMealPlan.name}</strong> ${relativeDate(now, nextMealPlan.startDate)}`
         } else {
-            actionMessage = `You currently have "${nextMealPlan.name}" ending ${relativeDate(now, nextMealPlan.endDate)}`
+            actionMessage = `You currently have <strong>${nextMealPlan.name}</strong> ending ${relativeDate(now, nextMealPlan.endDate)}`
         }
     } else {
         actionLink = `/meal-plans/create`
@@ -51,9 +51,9 @@ export default function Chef({ hasRecipes, nextMealPlan }: Props) {
             <ChefFace className="mb-6 -ml-4" />
             <div className="relative mb-4">
                 <div className="bg-black w-4 h-4 absolute bottom-full left-1/2 -translate-x-1/2 translate-y-1/2 rotate-45 " />
-                <div className="bg-black ml-2 px-4 leading-tight py-3 text-white rounded-lg text-lg max-w-xl">
-                    {welcomeMessage}, it's {formattedDate}! {actionMessage}.
-                </div>
+                <div className="bg-black ml-2 px-4 pt-3 pb-4 text-white rounded-lg text-lg max-w-xl"
+                    dangerouslySetInnerHTML={{ __html: `${welcomeMessage}, it's ${formattedDate}! ${actionMessage}.` }}
+                />
             </div>
             <Button variant="outline" asChild>
                 <Link href={actionLink}>

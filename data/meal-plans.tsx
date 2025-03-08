@@ -1,5 +1,6 @@
 const x = (() => {
     const now = new Date()
+
     const nextWeek = new Date()
     nextWeek.setDate(now.getDate() + 7)
 

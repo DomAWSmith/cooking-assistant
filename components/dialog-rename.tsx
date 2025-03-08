@@ -71,7 +71,7 @@ export default function DialogRename({ originalTitle, onSave }: Props) {
                             )}
                         />
                         <DialogFooter>
-                            <Button type="submit">Save</Button>
+                            <Button type="submit">Rename</Button>
                         </DialogFooter>
                     </form>
                 </Form>

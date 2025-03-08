@@ -8,6 +8,8 @@ import DialogRename from "@/components/dialog-rename"
 import { DatePickerWithRange } from "@/components/date-picker-with-range"
 import { addDays } from "date-fns"
 import { mealPlanDateRangeChanged, mealPlanRenamed } from "@/app/reducers/mealPlansSlice"
+import { RecipesPicker } from "@/components/recipes-picker"
+import { useState } from "react"
 
 export default function Page() {
   const { id } = useParams<{ id: string }>()
@@ -17,6 +19,8 @@ export default function Page() {
   const mealPlan = useAppSelector(state => state.mealPlans.find(i => i.id === id))
 
   const pageName = mealPlan?.title || "Not found"
+
+  const [recipeIds, setRecipeIds] = useState<string[]>([])
 
   const tomorrow = addDays(new Date(), 1)
   tomorrow.setHours(0, 0, 0, 0)
@@ -51,22 +55,28 @@ export default function Page() {
         </>
       }
     >
-      <div className="flex flex-1 flex-col gap- p-4">
-        <div className="flex items-center">
-          <div className="w-full md:ml-auto md:w-auto">
-            <DatePickerWithRange 
-              fromDate={startDate}
-              toDate={endDate}
-              onSave={(startDate, endDate) => {
-                dispatch(mealPlanDateRangeChanged({ 
-                  id, 
-                  startDate: startDate.getTime(), 
-                  endDate: endDate.getTime() 
-                }))
-              }}
-            />
-          </div>
+      <div className="flex gap-4 p-4">
+
+        <div>
+          <RecipesPicker
+            recipeIds={recipeIds}
+            onSave={(recipeIds) => setRecipeIds(recipeIds)}
+          />
         </div>
+        <div className="ml-auto">
+          <DatePickerWithRange
+            fromDate={startDate}
+            toDate={endDate}
+            onSave={(startDate, endDate) => {
+              dispatch(mealPlanDateRangeChanged({
+                id,
+                startDate: startDate.getTime(),
+                endDate: endDate.getTime()
+              }))
+            }}
+          />
+        </div>
+
       </div>
     </MealPlanSidebar>
   )

@@ -4,7 +4,6 @@ import MealDropperDropper from "@/components/meal-plan-organiser-dropper"
 import MealPlanOrganiserDragger from "@/components/meal-plan-organiser-dragger"
 import { useState } from "react"
 import { MealType } from "@/types/enums/MealType"
-import { RecipeDraggable } from "@/components/recipe-draggable"
 
 interface Props {
     recipes: IRecipe[]
@@ -50,7 +49,6 @@ export default function MealPlanOrganiser({ recipes }: Props) {
         >
             <div>
                 <div className="mb-12">
-                    <h2 className="mb-1 font-semibold">Choose a meal</h2>
                     <MealDropperDropper id={MealType.NONE}>
                         {unchosenRecipes.length > 0 ? (
                             unchosenRecipes.map(recipe => (

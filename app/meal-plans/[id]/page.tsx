@@ -54,8 +54,11 @@ export default function Page() {
         </>
       }
     >
-      <div className="flex flex-wrap gap-4 p-4">
-        <div className="w-full lg:w-auto lg:ml-auto lg:order-last">
+      <div className="flex flex-wrap justify-between gap-4 p-4">
+        <div className="flex-1 md:flex-0">
+          <MealPlanShoppingList />
+        </div>
+        <div className="flex-1 md:flex-0">
           <DatePickerWithRange
             fromDate={startDate}
             toDate={endDate}
@@ -67,9 +70,6 @@ export default function Page() {
               }))
             }}
           />
-        </div>
-        <div className="flex-1 sm:flex-none">
-          <MealPlanShoppingList />
         </div>
       </div>
 

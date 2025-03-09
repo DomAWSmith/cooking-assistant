@@ -11,6 +11,7 @@ import { mealPlanDateRangeChanged, mealPlanRenamed } from "@/app/reducers/mealPl
 import { RecipesPicker } from "@/components/recipes-picker"
 import { useState } from "react"
 import MealPlanOrganiser from "@/components/meal-plan-organiser"
+import { MealPlanShoppingList } from "@/components/meal-plan-shopping-list"
 
 export default function Page() {
   const { id } = useParams<{ id: string }>()
@@ -57,14 +58,8 @@ export default function Page() {
         </>
       }
     >
-      <div className="flex gap-4 p-4">
-        <div>
-          <RecipesPicker
-            recipeIds={recipeIds}
-            onSave={(recipeIds) => setRecipeIds(recipeIds)}
-          />
-        </div>
-        <div className="ml-auto">
+      <div className="flex flex-wrap gap-4 p-4">
+        <div className="w-full lg:w-auto lg:ml-auto lg:order-last">
           <DatePickerWithRange
             fromDate={startDate}
             toDate={endDate}
@@ -76,6 +71,15 @@ export default function Page() {
               }))
             }}
           />
+        </div>
+        <div className="flex-1 sm:flex-none">
+          <RecipesPicker
+            recipeIds={recipeIds}
+            onSave={(recipeIds) => setRecipeIds(recipeIds)}
+          />
+        </div>
+        <div className="flex-1 sm:flex-none">
+          <MealPlanShoppingList />
         </div>
       </div>
 

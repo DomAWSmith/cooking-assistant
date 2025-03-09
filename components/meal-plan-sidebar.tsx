@@ -65,7 +65,7 @@ export default function MealPlanSidebar({ children, breadcrumbs, showMobileAddNe
                         </BreadcrumbList>
                     </Breadcrumb>
 
-                    <div className={`ml-auto pl-2 md:hidden ${showMobileAddNew ? "" : "opacity-0 pointer-events-none"}`}>
+                    <div className={`ml-auto pl-2 md:hidden ${showMobileAddNew ? "" : "hidden"}`}>
                         <Button className="text-xs" tabIndex={showMobileAddNew ? 1 : 0}>
                             <Plus /> Add new
                         </Button>

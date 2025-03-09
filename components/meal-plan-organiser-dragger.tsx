@@ -20,7 +20,7 @@ export default function MealPlanOrganiserDragger({ recipe }: Props) {
             style={style} 
             {...listeners} 
             {...attributes} 
-            className={`${isDragging ? "rounded z-100 overflow-hidden outline outline-black/10" : "border-b last:border-b-0"}`}
+            className={`overflow-hidden border-b last:border-b-0 ${isDragging ? "z-100 rounded outline outline-black/10" : "first:rounded-t last:rounded-b"}`}
         >
             <RecipeDraggable {...recipe} />
         </button>

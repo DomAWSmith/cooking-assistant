@@ -4,6 +4,7 @@ import MealDropperDropper from "@/components/meal-plan-organiser-dropper"
 import MealPlanOrganiserDragger from "@/components/meal-plan-organiser-dragger"
 import { useState } from "react"
 import { MealType } from "@/types/enums/MealType"
+import { RecipesPicker } from "./recipes-picker"
 
 interface Props {
     recipes: IRecipe[]
@@ -41,56 +42,52 @@ export default function MealPlanOrganiser({ recipes }: Props) {
     const breakfastRecipes = recipes.filter(({ id }) => breakfastRecipeIds.includes(id))
     const lunchRecipes = recipes.filter(({ id }) => lunchRecipeIds.includes(id))
     const dinnerRecipes = recipes.filter(({ id }) => dinnerRecipeIds.includes(id))
-    const unchosenRecipes = recipes.filter(({ id }) => !breakfastRecipeIds.includes(id) && !lunchRecipeIds.includes(id) && !dinnerRecipeIds.includes(id))
 
     return (
         <DndContext
             onDragEnd={handleDragEnd}
         >
             <div>
-                {unchosenRecipes.length > 0 && (
-                    <div className="mb-12">
-                        <MealDropperDropper id={MealType.NONE}>
-                            {unchosenRecipes.map(recipe => (
-                                <MealPlanOrganiserDragger key={recipe.id} recipe={recipe} />
-                            ))}
-                        </MealDropperDropper>
+                <div className="mb-8">
+                    <div className="mb-2 flex items-end justify-between">
+                        <h2 className="text-lg font-semibold mr-2">Breakfast</h2>
+                        <RecipesPicker 
+                            recipeIds={breakfastRecipeIds}
+                            onSave={(recipeIds) => setBreakfastRecipeIds(recipeIds)}
+                        />
                     </div>
-                )}
-                <div className="mb-4">
-                    <h2 className="mb-1 font-semibold">Breakfast</h2>
-                    <MealDropperDropper id={MealType.BREAKFAST}>
-                        {breakfastRecipes.length > 0 ? (
-                            breakfastRecipes.map(recipe => (
-                                <MealPlanOrganiserDragger key={recipe.id} recipe={recipe} />
-                            ))
-                        ) : (
-                            <div className="p-4 opacity-70">No meals chosen</div>
-                        )}
+                    <MealDropperDropper id={MealType.BREAKFAST} isPopulated={breakfastRecipeIds.length > 0}>
+                        {breakfastRecipes.map(recipe => (
+                            <MealPlanOrganiserDragger key={recipe.id} recipe={recipe} />
+                        ))}
                     </MealDropperDropper>
                 </div>
-                <div className="mb-4">
-                    <h2 className="mb-1 font-semibold">Lunch</h2>
-                    <MealDropperDropper id={MealType.LUNCH}>
-                        {lunchRecipes.length > 0 ? (
-                            lunchRecipes.map(recipe => (
-                                <MealPlanOrganiserDragger key={recipe.id} recipe={recipe} />
-                            ))
-                        ) : (
-                            <div className="p-4 opacity-70">No meals chosen</div>
-                        )}
+                <div className="mb-8">
+                    <div className="mb-2 flex items-end justify-between">
+                        <h2 className="text-lg font-semibold mr-2">Lunch</h2>
+                        <RecipesPicker 
+                            recipeIds={lunchRecipeIds}
+                            onSave={(recipeIds) => setLunchRecipeIds(recipeIds)}
+                        />
+                    </div>
+                    <MealDropperDropper id={MealType.LUNCH} isPopulated={lunchRecipeIds.length > 0}>
+                        {lunchRecipes.map(recipe => (
+                            <MealPlanOrganiserDragger key={recipe.id} recipe={recipe} />
+                        ))}
                     </MealDropperDropper>
                 </div>
-                <div className="mb-4">
-                    <h2 className="mb-1 font-semibold">Dinner</h2>
-                    <MealDropperDropper id={MealType.DINNER}>
-                        {dinnerRecipes.length > 0 ? (
-                            dinnerRecipes.map(recipe => (
-                                <MealPlanOrganiserDragger key={recipe.id} recipe={recipe} />
-                            ))
-                        ) : (
-                            <div className="p-4 opacity-70">No meals chosen</div>
-                        )}
+                <div className="mb-8">
+                    <div className="mb-2 flex items-end justify-between">
+                        <h2 className="text-lg font-semibold mr-2">Dinner</h2>
+                        <RecipesPicker 
+                            recipeIds={dinnerRecipeIds}
+                            onSave={(recipeIds) => setDinnerRecipeIds(recipeIds)}
+                        />
+                    </div>
+                    <MealDropperDropper id={MealType.DINNER} isPopulated={dinnerRecipeIds.length > 0}>
+                        {dinnerRecipes.map(recipe => (
+                            <MealPlanOrganiserDragger key={recipe.id} recipe={recipe} />
+                        ))}
                     </MealDropperDropper>
                 </div>
             </div>

@@ -8,8 +8,6 @@ import DialogRename from "@/components/dialog-rename"
 import { DatePickerWithRange } from "@/components/date-picker-with-range"
 import { addDays } from "date-fns"
 import { mealPlanDateRangeChanged, mealPlanRenamed } from "@/app/reducers/mealPlansSlice"
-import { RecipesPicker } from "@/components/recipes-picker"
-import { useState } from "react"
 import MealPlanOrganiser from "@/components/meal-plan-organiser"
 import { MealPlanShoppingList } from "@/components/meal-plan-shopping-list"
 
@@ -22,8 +20,6 @@ export default function Page() {
   const recipes = useAppSelector(state => state.recipes)
 
   const pageName = mealPlan?.title || "Not found"
-
-  const [recipeIds, setRecipeIds] = useState<string[]>([])
 
   const tomorrow = addDays(new Date(), 1)
   tomorrow.setHours(0, 0, 0, 0)
@@ -73,19 +69,13 @@ export default function Page() {
           />
         </div>
         <div className="flex-1 sm:flex-none">
-          <RecipesPicker
-            recipeIds={recipeIds}
-            onSave={(recipeIds) => setRecipeIds(recipeIds)}
-          />
-        </div>
-        <div className="flex-1 sm:flex-none">
           <MealPlanShoppingList />
         </div>
       </div>
 
       <div className="p-4">
         <MealPlanOrganiser 
-          recipes={recipes.filter(recipe => recipeIds.includes(recipe.id))} 
+          recipes={recipes} 
         />
       </div>
     </MealPlanSidebar>

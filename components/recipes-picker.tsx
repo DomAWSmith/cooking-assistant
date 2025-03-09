@@ -1,4 +1,4 @@
-import { CookingPot, Pencil } from "lucide-react"
+import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -33,9 +33,9 @@ export function RecipesPicker({ recipeIds, onSave }: Props) {
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button className="w-full">
-                    <CookingPot />
-                    <span>{recipeIds.length > 0 ? `${recipeIds.length} ${recipeIds.length === 1 ? "recipe" : "recipes"} added` : "Add recipes"}</span>
+                <Button variant="outline" size="sm">
+                    <Plus />
+                    <span>{recipeIds.length > 0 ? `Add (${recipeIds.length})` : "Add"}</span>
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] overflow-y-scroll max-h-[90vh]">

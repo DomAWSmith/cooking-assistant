@@ -2,16 +2,23 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { IMealPlan } from "@/types/IMealPlan"
 import { addDays } from "date-fns"
 
+const lastMonth = addDays(new Date(), -30)
+lastMonth.setHours(0, 0, 0, 0)
+const lastWeek = addDays(new Date(), -7)
+lastWeek.setHours(0, 0, 0, 0)
+const yesterday = addDays(new Date(), -1)
+yesterday.setHours(0, 0, 0, 0)
 const tomorrow = addDays(new Date(), 1)
 tomorrow.setHours(0, 0, 0, 0)
 const nextWeek = addDays(new Date(), 7)
 nextWeek.setHours(0, 0, 0, 0)
 
+// const initialState: IMealPlan[] = []
 const initialState: IMealPlan[] = [
     {
         "id": "1",
         "title": "Meal plan 1",
-        "startDate": tomorrow.getTime(),
+        "startDate": yesterday.getTime(),
         "endDate": nextWeek.getTime(),
         "mealCount": 5,
         "currentIngredientCount": 4,
@@ -29,8 +36,8 @@ const initialState: IMealPlan[] = [
     {
         "id": "3",
         "title": "Meal plan 3",
-        "startDate": tomorrow.getTime(),
-        "endDate": nextWeek.getTime(),
+        "startDate": lastWeek.getTime(),
+        "endDate": yesterday.getTime(),
         "mealCount": 4,
         "currentIngredientCount": 3,
         "totalIngredientCount": 6
@@ -38,8 +45,8 @@ const initialState: IMealPlan[] = [
     {
         "id": "4",
         "title": "Meal plan 4",
-        "startDate": tomorrow.getTime(),
-        "endDate": nextWeek.getTime(),
+        "startDate": lastMonth.getTime(),
+        "endDate": lastWeek.getTime(),
         "mealCount": 4,
         "currentIngredientCount": 0,
         "totalIngredientCount": 11

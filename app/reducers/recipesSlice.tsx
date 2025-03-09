@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { IRecipe } from "@/types/IRecipe"
 
+// const initialState: IRecipe[] = []
 const initialState: IRecipe[] = [
     {
         "id": "1",

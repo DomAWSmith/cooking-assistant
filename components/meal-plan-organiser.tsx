@@ -73,7 +73,7 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                     if (isOpen) return false
                     setSelectingDateId(null)
                 }}
-                title={`Add to ${selectingDateId ? prettyDateFormatter.format(getDateFromDateId(selectingDateId)) : ""} meal`}
+                title="Add to meal"
                 onSave={(recipeIds) => {
                     if (selectingDateId === null) return
 

@@ -8,6 +8,7 @@ import { RecipesPickerDialog } from "./recipes-picker-dialog"
 import { Button } from "./ui/button"
 import { Plus } from "lucide-react"
 import { getMealTypeTitle, getUniqueArray } from "@/lib/utils"
+import { Macros } from "./macros"
 
 interface Props {
     recipes: IRecipe[]
@@ -65,6 +66,22 @@ export default function MealPlanOrganiser({ recipes }: Props) {
             break                        
     }
 
+    const breakfastMacros = breakfastRecipes.reduce((prev, curr) => ({
+        protein: prev.protein + curr.protein,
+        fats: prev.fats + curr.fats,
+        carbs: prev.carbs + curr.carbs,
+    }), { protein: 0, fats: 0, carbs: 0 })
+    const lunchMacros = lunchRecipes.reduce((prev, curr) => ({
+        protein: prev.protein + curr.protein,
+        fats: prev.fats + curr.fats,
+        carbs: prev.carbs + curr.carbs,
+    }), { protein: 0, fats: 0, carbs: 0 })
+    const dinnerMacros = dinnerRecipes.reduce((prev, curr) => ({
+        protein: prev.protein + curr.protein,
+        fats: prev.fats + curr.fats,
+        carbs: prev.carbs + curr.carbs,
+    }), { protein: 0, fats: 0, carbs: 0 })
+
     // TODO - change droppable areas to days within the meal plan range
     // TODO - allow duplicates of the same recipe in the meal plan
 
@@ -100,6 +117,9 @@ export default function MealPlanOrganiser({ recipes }: Props) {
                     <div className="mb-8">
                         <div className="mb-2 flex items-end justify-between">
                             <h2 className="text-lg font-semibold mr-2">Breakfast</h2>
+                            <div className="mr-4">
+                                <Macros {...breakfastMacros} />
+                            </div>
                         </div>
                         <MealDropperDropper id={MealType.BREAKFAST} isPopulated={breakfastRecipeIds.length > 0}>
                             {breakfastRecipes.map(recipe => (
@@ -119,6 +139,9 @@ export default function MealPlanOrganiser({ recipes }: Props) {
                     <div className="mb-8">
                         <div className="mb-2 flex items-end justify-between">
                             <h2 className="text-lg font-semibold mr-2">Lunch</h2>
+                            <div className="mr-4">
+                                <Macros {...lunchMacros} />
+                            </div>
                         </div>
                         <MealDropperDropper id={MealType.LUNCH} isPopulated={lunchRecipeIds.length > 0}>
                             {lunchRecipes.map(recipe => (
@@ -138,6 +161,9 @@ export default function MealPlanOrganiser({ recipes }: Props) {
                     <div className="mb-8">
                         <div className="mb-2 flex items-end justify-between">
                             <h2 className="text-lg font-semibold mr-2">Dinner</h2>
+                            <div className="mr-4">
+                                <Macros {...dinnerMacros} />
+                            </div>
                         </div>
                         <MealDropperDropper id={MealType.DINNER} isPopulated={dinnerRecipeIds.length > 0}>
                             {dinnerRecipes.map(recipe => (

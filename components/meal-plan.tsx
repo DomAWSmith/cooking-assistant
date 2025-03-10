@@ -30,13 +30,13 @@ export function MealPlan(mealPlan: IMealPlan) {
   return (
     <Link
       href={href}
-      className={`${pathname === href ? "bg-sidebar-accent" : "text-sidebar-accent-foreground"} hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap last:border-b-0`}
+      className={`flex ${pathname === href ? "bg-sidebar-accent" : "text-sidebar-accent-foreground"} hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap last:border-b-0`}
     >
-      <div className="flex w-full items-center gap-2">
-        <span>{getMealPlanTitle(mealPlan)}</span>{" "}
-        <span className="ml-auto text-xs">
+      <div className="flex w-full items-center justify-between gap-2">
+        <div className="overflow-hidden truncate max-w-48">{getMealPlanTitle(mealPlan)}</div>
+        <div className="text-xs shrink-0">
           {dateFormatter.formatRange(mealPlan.startDate, mealPlan.endDate)}
-        </span>
+        </div>
       </div>
       <div className="flex w-full gap-2 pt-2">
         <Badge className="font-mono font-light" variant="outline">{mealCount} <CookingPot /></Badge>

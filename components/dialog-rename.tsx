@@ -45,8 +45,8 @@ export default function DialogRename({ originalTitle, onSave }: Props) {
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button variant="ghost">
-                    <span>{originalTitle}</span>
+                <Button variant="ghost" className="max-w-56">
+                    <span className="truncate overflow-hidden">{originalTitle}</span>
                     <Pencil size={16} className="ml-2" />
                 </Button>
             </DialogTrigger>

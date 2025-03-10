@@ -11,9 +11,9 @@ interface Props {
 export function Recipe({ recipe, separateNutrition = true }: Props) {
   return (
     <>
-      <div className="flex w-full items-center gap-2">
-        <span>{recipe.name}</span>{" "}
-        <span className="ml-auto text-xs">{recipe.date}</span>
+      <div className="flex w-full items-center justify-between gap-2">
+        <div className="overflow-hidden truncate max-w-48">{recipe.name}</div>
+        <div className="text-xs shrink-0">{recipe.date}</div>
       </div>
       <div className={`flex w-full gap-2 pt-2 ${separateNutrition ? "justify-between" : "justify-end"}`}>
         <Badge className="font-mono font-light" variant="outline">{recipe.nutrition.calories} <Flame /></Badge>

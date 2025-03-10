@@ -17,7 +17,9 @@ import { Button } from "@/components/ui/button"
 import { MealPlans } from "@/components/meal-plans"
 
 import { ReactNode } from "react"
-import { useAppSelector } from "@/lib/hooks"
+import { useAppDispatch, useAppSelector } from "@/lib/hooks"
+import { mealPlanAdded } from "@/app/reducers/mealPlansSlice"
+import { addDays, nextMonday, startOfYesterday } from "date-fns"
 
 interface Props {
     children: ReactNode
@@ -27,6 +29,21 @@ interface Props {
 
 export default function MealPlanSidebar({ children, breadcrumbs, showMobileAddNew }: Props) {
     const mealPlans = useAppSelector(state => state.mealPlans)
+    const dispatch = useAppDispatch()
+
+    const createNew = () => {
+        const yesterday = startOfYesterday()
+        const startDate = nextMonday(yesterday)
+
+        dispatch(mealPlanAdded({
+            id: crypto.randomUUID(),
+            title: "",
+            startDate: startDate.getTime(),
+            endDate: addDays(startDate, 7).getTime(),
+            currentIngredientCount: 0,
+            dates: []
+        }))
+    }
     
     return (
         <SidebarProvider
@@ -45,7 +62,7 @@ export default function MealPlanSidebar({ children, breadcrumbs, showMobileAddNe
                             </div>
 
                             <div className="flex items-center gap-2 text-sm">
-                                <Button>
+                                <Button onClick={createNew}>
                                     <Plus /> Add new
                                 </Button>
                             </div>
@@ -66,7 +83,7 @@ export default function MealPlanSidebar({ children, breadcrumbs, showMobileAddNe
                     </Breadcrumb>
 
                     <div className={`ml-auto pl-2 md:hidden ${showMobileAddNew ? "" : "hidden"}`}>
-                        <Button className="text-xs" tabIndex={showMobileAddNew ? 1 : 0}>
+                        <Button onClick={createNew} className="text-xs" tabIndex={showMobileAddNew ? 1 : 0}>
                             <Plus /> Add new
                         </Button>
                     </div>

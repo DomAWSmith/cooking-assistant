@@ -10,6 +10,7 @@ import { addDays } from "date-fns"
 import { mealPlanDateRangeChanged, mealPlanRenamed } from "@/app/reducers/mealPlansSlice"
 import MealPlanOrganiser from "@/components/meal-plan-organiser"
 import { MealPlanShoppingList } from "@/components/meal-plan-shopping-list"
+import { getMealPlanTitle } from "@/lib/utils"
 
 export default function Page() {
   const { id } = useParams<{ id: string }>()
@@ -19,7 +20,7 @@ export default function Page() {
   const mealPlan = useAppSelector(state => state.mealPlans.find(i => i.id === id))
   const recipes = useAppSelector(state => state.recipes)
 
-  const pageName = mealPlan?.title || "Not found"
+  const pageName = mealPlan === undefined ? "Not Found" : getMealPlanTitle(mealPlan)
 
   const tomorrow = addDays(new Date(), 1)
   tomorrow.setHours(0, 0, 0, 0)

@@ -99,3 +99,13 @@ export function transformNutritionByServing(nutrition: INutrition, servingCount:
 export function formatNutritionNumber(value: number) {
   return Number(value.toFixed(2))
 }
+
+export function getMealPlanTitle(mealPlan: IMealPlan) {
+  if (mealPlan.title) return mealPlan.title
+  
+  const dateFormatter = new Intl.DateTimeFormat("en-GB", {
+    dateStyle: "long"
+  })
+
+  return dateFormatter.formatRange(mealPlan.startDate, mealPlan.endDate)
+}

@@ -39,7 +39,7 @@ export default function MealPlanOrganiserDragger({ mealPlanId, dateId, dateMeal 
         <div
             ref={setNodeRef}
             style={style}
-            className={`overflow-hidden border-b last:border-b-0 ${isDragging ? "z-100 rounded outline outline-black/10" : "first:rounded-t last:rounded-b"}`}
+            className={`overflow-hidden touch-none border-b last:border-b-0 ${isDragging ? "z-100 rounded outline outline-black/10" : "first:rounded-t last:rounded-b"}`}
         >
             <div 
                 className="flex flex-col bg-background transition-all duration-200 text-sidebar-accent-foreground  text-sm leading-tight whitespace-nowrap"

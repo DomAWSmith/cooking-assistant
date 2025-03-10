@@ -61,7 +61,7 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
         }))
     }
 
-    const prettyDateFormatter = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "long" })
+    const prettyDateFormatter = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric" })
     const dayCount = getAmountOfDaysBetween(startDate, endDate)
     let dates: Date[] = []
     for (let i = 0; i <= dayCount; i++) dates.push(addDays(mealPlan.startDate, i))
@@ -138,19 +138,26 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
 
                     return (
                         <div key={dateId} className="mb-8">
-                            <div className="mb-2 flex items-end justify-between">
-                                <div className="flex mr-2 gap-2 items-center">
-                                    {isToday(date) && <div className="w-2 h-2  mr-1 bg-green-500 rounded-full animate-pulse" />}
-                                    <h2 className="text-lg font-semibold">{prettyDateFormatter.format(date)}</h2>
-                                    <MealPlanDateNoteDialog 
-                                        originalNote={dateNote}
-                                        onSave={(note => {
-                                            dispatch(mealPlanDateNoteChanged({ mealPlanId: mealPlan.id, dateId, note }))
-                                        })}
-                                    />
+                            <div className="mb-2 flex flex-col justify-between lg:flex-row lg:items-end">
+                                <div className="flex flex-col">
+                                    <div className="flex mr-2 gap-2 items-center">
+                                        {isToday(date) && <div className="w-2 h-2  mr-1 bg-green-500 rounded-full animate-pulse" />}
+                                        <h2 className="text-lg font-semibold">{prettyDateFormatter.format(date)}</h2>
+                                        <MealPlanDateNoteDialog 
+                                            originalNote={dateNote}
+                                            onSave={(note => {
+                                                dispatch(mealPlanDateNoteChanged({ mealPlanId: mealPlan.id, dateId, note }))
+                                            })}
+                                        />
+                                    </div>
+                                    {dateNote && (
+                                        <div className="italic text-sm opacity-70">
+                                            {dateNote}
+                                        </div>
+                                    )}
                                 </div>
                                 {dateMeals.length > 0 && (
-                                    <div className="mr-4 ml-auto">
+                                    <div className="ml-auto mt-2">
                                         <div className="flex gap-2 justify-end">
                                             <Badge className="font-mono font-light" variant="outline">{formatNutritionNumber(nutrition.calories)} <Flame /></Badge>
                                             <Macros macros={nutrition.macros} />
@@ -158,11 +165,6 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                                     </div>
                                 )}
                             </div>
-                            {dateNote && (
-                                <div className="mb-2 italic text-sm opacity-70">
-                                    {dateNote}
-                                </div>
-                            )}
                             <MealDropperDropper id={dateId} isPopulated={dateMeals.length > 0}>
                                 {dateMeals.map(dateMeal => (
                                     <MealPlanOrganiserDragger 

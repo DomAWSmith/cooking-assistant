@@ -39,7 +39,7 @@ export default function MealPlanOrganiserDragger({ mealPlanId, dateId, dateMeal 
         <div
             ref={setNodeRef}
             style={style}
-            className={`overflow-hidden touch-none border-b last:border-b-0 ${isDragging ? "z-100 rounded outline outline-black/10" : "first:rounded-t last:rounded-b"}`}
+            className={`overflow-hidden border-b last:border-b-0 ${isDragging ? "z-100 rounded outline outline-black/10" : "first:rounded-t last:rounded-b"}`}
         >
             <div 
                 className="flex flex-col bg-background transition-all duration-200 text-sidebar-accent-foreground  text-sm leading-tight whitespace-nowrap"
@@ -48,7 +48,7 @@ export default function MealPlanOrganiserDragger({ mealPlanId, dateId, dateMeal 
                     <button
                         {...listeners}
                         {...attributes}
-                        className="transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground pr-2"
+                        className="touch-none transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground pr-2"
                     >
                         <GripVertical className="ml-4 opacity-50" />
                     </button>

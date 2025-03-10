@@ -24,11 +24,9 @@ const initialState: IMealPlan[] = [
     {
         "id": "1",
         "title": "Meal plan 1",
-        "startDate": today.getTime(),
-        "endDate": nextWeek.getTime(),
-        "mealCount": 5,
-        "currentIngredientCount": 4,
-        "totalIngredientCount": 10,
+        "startDate": yesterday.getTime(),
+        "endDate": addDays(yesterday, 5).getTime(),
+        "currentIngredientCount": 0,
         "dates": []
     },
     {
@@ -36,9 +34,7 @@ const initialState: IMealPlan[] = [
         "title": "Meal plan 2",
         "startDate": tomorrow.getTime(),
         "endDate": nextMonth.getTime(),
-        "mealCount": 3,
         "currentIngredientCount": 0,
-        "totalIngredientCount": 1,
         "dates": []
     },
     {
@@ -46,9 +42,7 @@ const initialState: IMealPlan[] = [
         "title": "Meal plan 3",
         "startDate": lastWeek.getTime(),
         "endDate": yesterday.getTime(),
-        "mealCount": 4,
-        "currentIngredientCount": 3,
-        "totalIngredientCount": 6,
+        "currentIngredientCount": 0,
         "dates": []
     },
     {
@@ -56,9 +50,7 @@ const initialState: IMealPlan[] = [
         "title": "Meal plan 4",
         "startDate": lastMonth.getTime(),
         "endDate": lastWeek.getTime(),
-        "mealCount": 4,
         "currentIngredientCount": 0,
-        "totalIngredientCount": 11,
         "dates": []
     }
 ] // TODO: use real data
@@ -84,6 +76,8 @@ const mealPlansSlice = createSlice({
             } : mealPlan)
         },
         mealPlanDateMealsChanged: (state, { payload: { mealPlanId, dateId, meals } }: PayloadAction<{ mealPlanId: string, dateId: string, meals: IMealPlanDateMeal[] }>) => {
+            const mealCount = meals.length
+
             return state.map(mealPlan => {
                 const hasDate = mealPlan.dates.find(date => date.id === dateId)
                 if (hasDate) {
@@ -93,11 +87,13 @@ const mealPlansSlice = createSlice({
                             ...date,
                             meals
                         } : date),
+                        mealCount
                     } : mealPlan
                 } else {
                     return mealPlan.id === mealPlanId ? {
                         ...mealPlan,
                         dates: [...mealPlan.dates, { id: dateId, meals }],
+                        mealCount
                     } : mealPlan
                 }
             })

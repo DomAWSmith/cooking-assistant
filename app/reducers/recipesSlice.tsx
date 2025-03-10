@@ -14,7 +14,17 @@ const initialState: IRecipe[] = [
                 "fats": 5.2,
                 "protein": 10
             }
-        }
+        },
+        "ingredients": [
+            {
+                "id": "1",
+                "name": "Ingredient 1"
+            },
+            {
+                "id": "2",
+                "name": "Ingredient 2"
+            }
+        ]
     },
     {
         "id": "2",
@@ -27,7 +37,13 @@ const initialState: IRecipe[] = [
                 "fats": 53.2,
                 "protein": 20
             }
-        }
+        },
+        "ingredients": [
+            {
+                "id": "1",
+                "name": "Ingredient 1"
+            }
+        ]
     }
 ] // TODO: use real data
 

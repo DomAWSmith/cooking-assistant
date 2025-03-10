@@ -69,7 +69,7 @@ export default function MealPlanOrganiserDragger({ mealPlanId, dateId, dateMeal 
                             servingCount: Math.max(servingCount - 1, minServings)
                         }))}
                     ><Minus /></Button>
-                    <div>{servingCount} servings</div>
+                    <div className="px-2">{servingCount} servings</div>
                     <Button
                         size="sm"
                         variant="outline"

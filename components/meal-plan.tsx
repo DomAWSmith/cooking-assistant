@@ -16,6 +16,16 @@ export function MealPlan(mealPlan: IMealPlan) {
 
   const href = `/meal-plans/${mealPlan.id}`
 
+  let mealCount = 0
+  let totalIngredientCount = 0
+  mealPlan.dates.forEach(date => {
+    mealCount += date.meals.length
+
+    date.meals.forEach(meal => {
+      totalIngredientCount += meal.recipe.ingredients.length
+    })
+  })
+
   return (
     <Link
       href={href}
@@ -28,8 +38,8 @@ export function MealPlan(mealPlan: IMealPlan) {
         </span>
       </div>
       <div className="flex w-full gap-2 pt-2">
-        <Badge className="font-mono font-light" variant="outline">{mealPlan.mealCount} <CookingPot /></Badge>
-        <Badge className="font-mono font-light" variant="outline">{mealPlan.currentIngredientCount}/{mealPlan.totalIngredientCount} <ListTodo /></Badge>
+        <Badge className="font-mono font-light" variant="outline">{mealCount} <CookingPot /></Badge>
+        <Badge className="font-mono font-light" variant="outline">{mealPlan.currentIngredientCount}/{totalIngredientCount} <ListTodo /></Badge>
       </div>
     </Link>
   )

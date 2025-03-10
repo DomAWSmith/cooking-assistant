@@ -32,7 +32,7 @@ export default function Chef({ hasRecipes, nextMealPlan }: Props) {
     let actionMessage = ""
     if (!hasRecipes) {
         actionIcon = <NotebookPen />
-        actionLink = `/recipes/create`
+        actionLink = `/recipes`
         actionLabel = "Create your first recipe"
         actionMessage = `Once you've created some recipes, you'll be able to plan meals`
     } else if (nextMealPlan !== null) {
@@ -57,7 +57,7 @@ export default function Chef({ hasRecipes, nextMealPlan }: Props) {
         }
     } else {
         actionIcon = <CookingPot />
-        actionLink = `/meal-plans/create`
+        actionLink = `/meal-plans`
         actionLabel = "Create your first meal plan"
         actionMessage = `You have no meals planned`
     }

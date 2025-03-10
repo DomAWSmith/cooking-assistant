@@ -97,7 +97,7 @@ export function transformNutritionByServing(nutrition: INutrition, servingCount:
 }
 
 export function formatNutritionNumber(value: number) {
-  return Number(value.toFixed(2))
+  return Math.round(value)
 }
 
 export function getMealPlanTitle(mealPlan: IMealPlan) {

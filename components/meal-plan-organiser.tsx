@@ -5,16 +5,17 @@ import MealPlanOrganiserDragger from "@/components/meal-plan-organiser-dragger"
 import { useState } from "react"
 import { RecipesPickerDialog } from "./recipes-picker-dialog"
 import { Button } from "./ui/button"
-import { Flame, Plus } from "lucide-react"
-import { formatNutritionNumber, getAmountOfDaysBetween, getDateFromDateId, getDateId, getUniqueArray, transformNutritionByServing } from "@/lib/utils"
+import { Edit, Flame, Plus } from "lucide-react"
+import { formatNutritionNumber, getAmountOfDaysBetween, getDateId, transformNutritionByServing } from "@/lib/utils"
 import { Macros } from "./macros"
 import { addDays, isToday } from "date-fns"
 import { IMealPlan } from "@/types/IMealPlan"
 import { useAppDispatch } from "@/lib/hooks"
-import { mealPlanDateMealsChanged } from "@/app/reducers/mealPlansSlice"
+import { mealPlanDateMealsChanged, mealPlanDateNoteChanged } from "@/app/reducers/mealPlansSlice"
 import { IMealPlanDateMeal } from "@/types/IMealPlanDateMeal"
 import { Badge } from "./ui/badge"
 import { INutrition } from "@/types/INutrition"
+import { MealPlanDateNoteDialog } from "@/components/meal-plan-date-note-dialog"
 
 interface Props {
     mealPlan: IMealPlan
@@ -110,7 +111,9 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
             >
                 {dates.map(date => {
                     const dateId = getDateId(date)
-                    const dateMeals = mealPlan.dates.find(date => date.id === dateId)?.meals || []
+                    const mealDate = mealPlan.dates.find(date => date.id === dateId)
+                    const dateMeals = mealDate?.meals || []
+                    const dateNote = mealDate?.note || ""
 
                     const nutrition: INutrition = dateMeals
                         .reduce((prev, curr) => {
@@ -136,9 +139,15 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                     return (
                         <div key={dateId} className="mb-8">
                             <div className="mb-2 flex items-end justify-between">
-                                <div className="flex mr-2 gap-3 items-center">
-                                    {isToday(date) && <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />}
+                                <div className="flex mr-2 gap-2 items-center">
+                                    {isToday(date) && <div className="w-2 h-2  mr-1 bg-green-500 rounded-full animate-pulse" />}
                                     <h2 className="text-lg font-semibold">{prettyDateFormatter.format(date)}</h2>
+                                    <MealPlanDateNoteDialog 
+                                        originalNote={dateNote}
+                                        onSave={(note => {
+                                            dispatch(mealPlanDateNoteChanged({ mealPlanId: mealPlan.id, dateId, note }))
+                                        })}
+                                    />
                                 </div>
                                 {dateMeals.length > 0 && (
                                     <div className="mr-4 ml-auto">
@@ -149,6 +158,11 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                                     </div>
                                 )}
                             </div>
+                            {dateNote && (
+                                <div className="mb-2 italic text-sm opacity-70">
+                                    {dateNote}
+                                </div>
+                            )}
                             <MealDropperDropper id={dateId} isPopulated={dateMeals.length > 0}>
                                 {dateMeals.map(dateMeal => (
                                     <MealPlanOrganiserDragger 

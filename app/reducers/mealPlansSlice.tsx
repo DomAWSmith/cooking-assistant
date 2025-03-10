@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { addDays } from "date-fns"
 import { IMealPlan } from "@/types/IMealPlan"
-import { IMealPlanDate } from "@/types/IMealPlanDate"
 import { IMealPlanDateMeal } from "@/types/IMealPlanDateMeal"
 
 const lastMonth = addDays(new Date(), -30)
@@ -76,8 +75,6 @@ const mealPlansSlice = createSlice({
             } : mealPlan)
         },
         mealPlanDateMealsChanged: (state, { payload: { mealPlanId, dateId, meals } }: PayloadAction<{ mealPlanId: string, dateId: string, meals: IMealPlanDateMeal[] }>) => {
-            const mealCount = meals.length
-
             return state.map(mealPlan => {
                 const hasDate = mealPlan.dates.find(date => date.id === dateId)
                 if (hasDate) {
@@ -86,17 +83,35 @@ const mealPlansSlice = createSlice({
                         dates: mealPlan.dates.map(date => date.id === dateId ? {
                             ...date,
                             meals
-                        } : date),
-                        mealCount
+                        } : date)
                     } : mealPlan
                 } else {
                     return mealPlan.id === mealPlanId ? {
                         ...mealPlan,
                         dates: [...mealPlan.dates, { id: dateId, meals }],
-                        mealCount
                     } : mealPlan
                 }
             })
+        },
+        mealPlanDateNoteChanged: (state, { payload: { mealPlanId, dateId, note } }: PayloadAction<{ mealPlanId: string, dateId: string, note: string }>) => {
+            return state.map(mealPlan => {
+                const hasDate = mealPlan.dates.find(date => date.id === dateId)
+                if (hasDate) {
+                    return mealPlan.id === mealPlanId ? {
+                        ...mealPlan,
+                        dates: mealPlan.dates.map(date => date.id === dateId ? {
+                            ...date,
+                            note
+                        } : date)
+                    } : mealPlan
+                } else {
+                    return mealPlan.id === mealPlanId ? {
+                        ...mealPlan,
+                        dates: [...mealPlan.dates, { id: dateId, meals: [], note }],
+                    } : mealPlan
+                }
+            })
+
         },
         mealPlanDateMealServingChanged: (state, { payload: { mealPlanId, dateId, mealId, servingCount } }: PayloadAction<{ mealPlanId: string, dateId: string, mealId: string, servingCount: number }>) => {
             return state.map(mealPlan => mealPlan.id === mealPlanId ? {
@@ -113,5 +128,5 @@ const mealPlansSlice = createSlice({
     }
 })
 
-export const { mealPlanAdded, mealPlanRenamed, mealPlanDateRangeChanged, mealPlanDateMealsChanged, mealPlanDateMealServingChanged } = mealPlansSlice.actions
+export const { mealPlanAdded, mealPlanRenamed, mealPlanDateRangeChanged, mealPlanDateMealsChanged, mealPlanDateNoteChanged, mealPlanDateMealServingChanged } = mealPlansSlice.actions
 export default mealPlansSlice.reducer

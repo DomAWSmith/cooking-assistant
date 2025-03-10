@@ -1,3 +1,4 @@
+import { MealType } from "@/types/enums/MealType"
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -32,4 +33,20 @@ export function relativeDate(d1: Date, d2: Date) {
   const diffDays = Math.round(Math.abs((d1.getTime() - d2.getTime()) / oneDay))
 
   return rtf1.format(diffDays, "day")
+}
+
+export function getUniqueArray(array: any[]) {
+  return Array.from(new Set(array))
+}
+
+export function getMealTypeTitle(mealType: MealType) {
+  switch (mealType) {
+    case MealType.BREAKFAST:
+      return "Breakfast"
+    case MealType.LUNCH:
+      return "Lunch"
+    case MealType.DINNER:
+      return "Dinner"
+  }
+  return "Unknown"
 }

@@ -1,4 +1,3 @@
-import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -7,21 +6,26 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useAppSelector } from "@/lib/hooks"
 import { RecipeSelect } from "@/components/recipes-select"
 
 interface Props {
+    isOpen: boolean,
+    setIsOpen: (isOpen: boolean) => void
+    title: string
     recipeIds: string[]
     onSave: (recipeIds: string[]) => void
 }
 
-export function RecipesPicker({ recipeIds, onSave }: Props) {
-    const [isOpen, setIsOpen] = useState(false)
-    const [selectedRecipeIds, setSelectedRecipeIds] = useState(recipeIds)
+export function RecipesPickerDialog({ isOpen, setIsOpen, title, recipeIds, onSave }: Props) {
+    const [selectedRecipeIds, setSelectedRecipeIds] = useState<string[]>([])
+
+    useEffect(() => {
+        setSelectedRecipeIds(recipeIds)
+    }, [recipeIds])
 
     const recipes = useAppSelector(state => state.recipes)
     
@@ -32,15 +36,9 @@ export function RecipesPicker({ recipeIds, onSave }: Props) {
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-                <Button variant="outline" size="sm">
-                    <Plus />
-                    <span>{recipeIds.length > 0 ? `Add (${recipeIds.length})` : "Add"}</span>
-                </Button>
-            </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] overflow-y-scroll max-h-[90vh]">
                 <DialogHeader>
-                    <DialogTitle>Add recipes</DialogTitle>
+                    <DialogTitle>{title}</DialogTitle>
                     <DialogDescription>
                         Select the recipes you'd like to include in your meal plan
                     </DialogDescription>

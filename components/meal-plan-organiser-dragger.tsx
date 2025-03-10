@@ -54,7 +54,7 @@ export default function MealPlanOrganiserDragger({ mealPlanId, dateId, dateMeal 
                     </button>
 
                     <div className="flex w-full flex-col items-start gap-2 pl-1 p-4">
-                        <Recipe {...servingsRecipe} />
+                        <Recipe separateNutrition={false} recipe={servingsRecipe} />
                     </div>
                 </div>
                 <div className="w-full py-2 flex items-center gap-2 justify-center bg-slate-200/50">

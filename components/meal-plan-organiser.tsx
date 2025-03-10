@@ -140,12 +140,14 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                                     {isToday(date) && <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />}
                                     <h2 className="text-lg font-semibold">{prettyDateFormatter.format(date)}</h2>
                                 </div>
-                                <div className="mr-4 ml-auto">
-                                    <div className="flex gap-2">
-                                        <Badge className="font-mono font-light" variant="outline">{formatNutritionNumber(nutrition.calories)} <Flame /></Badge>
-                                        <Macros {...nutrition.macros} />
+                                {dateMeals.length > 0 && (
+                                    <div className="mr-4 ml-auto">
+                                        <div className="flex gap-2 justify-end">
+                                            <Badge className="font-mono font-light" variant="outline">{formatNutritionNumber(nutrition.calories)} <Flame /></Badge>
+                                            <Macros macros={nutrition.macros} />
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                             </div>
                             <MealDropperDropper id={dateId} isPopulated={dateMeals.length > 0}>
                                 {dateMeals.map(dateMeal => (

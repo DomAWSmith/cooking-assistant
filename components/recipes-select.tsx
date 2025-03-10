@@ -34,7 +34,7 @@ export function RecipeSelect({ recipes, selectedIds, onSelect }: Props) {
             <Checkbox tabIndex={-1} checked={selectedIds.includes(recipe.id)} />
           </div>
           <div className="flex w-full flex-col items-start gap-2 pl-2 p-4">
-            <Recipe {...recipe} />
+            <Recipe recipe={recipe} />
           </div>
         </div>
       ))}

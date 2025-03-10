@@ -1,9 +1,8 @@
 import { ReactNode } from "react"
 import { useDroppable } from "@dnd-kit/core"
-import { MealType } from "@/types/enums/MealType"
 
 interface Props {
-    id: MealType
+    id: string
     isPopulated: boolean
     children: ReactNode
 }

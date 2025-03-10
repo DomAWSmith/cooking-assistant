@@ -3,184 +3,172 @@ import { DndContext } from "@dnd-kit/core"
 import MealDropperDropper from "@/components/meal-plan-organiser-dropper"
 import MealPlanOrganiserDragger from "@/components/meal-plan-organiser-dragger"
 import { useState } from "react"
-import { MealType } from "@/types/enums/MealType"
 import { RecipesPickerDialog } from "./recipes-picker-dialog"
 import { Button } from "./ui/button"
-import { Plus } from "lucide-react"
-import { getMealTypeTitle, getUniqueArray } from "@/lib/utils"
+import { Flame, Plus } from "lucide-react"
+import { formatNutritionNumber, getAmountOfDaysBetween, getDateFromDateId, getDateId, getUniqueArray, transformNutritionByServing } from "@/lib/utils"
 import { Macros } from "./macros"
+import { addDays, isToday } from "date-fns"
+import { IMealPlan } from "@/types/IMealPlan"
+import { useAppDispatch } from "@/lib/hooks"
+import { mealPlanDateMealsChanged } from "@/app/reducers/mealPlansSlice"
+import { IMealPlanDateMeal } from "@/types/IMealPlanDateMeal"
+import { Badge } from "./ui/badge"
+import { INutrition } from "@/types/INutrition"
 
 interface Props {
+    mealPlan: IMealPlan
     recipes: IRecipe[]
 }
 
-export default function MealPlanOrganiser({ recipes }: Props) {
-    const [selectingMealType, setSelectingMealType] = useState<MealType | null>(null)
+export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
+    const dispatch = useAppDispatch()
 
-    const [breakfastRecipeIds, setBreakfastRecipeIds] = useState<string[]>([])
-    const [lunchRecipeIds, setLunchRecipeIds] = useState<string[]>([])
-    const [dinnerRecipeIds, setDinnerRecipeIds] = useState<string[]>([])
+    const [lastDateMealId, setLastDateMealId] = useState(0)
+    const [selectingDateId, setSelectingDateId] = useState<string | null>(null)
+
+    const startDate = new Date(mealPlan.startDate)
+    const endDate = new Date(mealPlan.endDate)
 
     function handleDragEnd(event: any) {
         const { active, over } = event
-        const { id: mealId } = over
-        const { id: recipeId } = active
+        const { id: dateId } = over
+        const { id: dateMealId } = active
 
-        switch (mealId) {
-            case MealType.BREAKFAST:
-                setBreakfastRecipeIds(getUniqueArray([...breakfastRecipeIds, recipeId]))
-                setLunchRecipeIds(lunchRecipeIds.filter(i => i !== recipeId))
-                setDinnerRecipeIds(dinnerRecipeIds.filter(i => i !== recipeId))
-                break
-            case MealType.LUNCH:
-                setBreakfastRecipeIds(breakfastRecipeIds.filter(i => i !== recipeId))
-                setLunchRecipeIds(getUniqueArray([...lunchRecipeIds, recipeId]))
-                setDinnerRecipeIds(dinnerRecipeIds.filter(i => i !== recipeId))
-                break
-            case MealType.DINNER:
-                setBreakfastRecipeIds(breakfastRecipeIds.filter(i => i !== recipeId))
-                setLunchRecipeIds(lunchRecipeIds.filter(i => i !== recipeId))
-                setDinnerRecipeIds(getUniqueArray([...dinnerRecipeIds, recipeId]))
-                break
+        const newMealPlanDate = mealPlan.dates.find(({ id }) => id === dateId) || {
+            id: dateId,
+            meals: []
         }
+        const oldMealPlanDate = mealPlan.dates.find(date => date.meals.map(({ id }) => id).includes(dateMealId))
+        const dateMeal = (oldMealPlanDate?.meals || []).find(({ id }) => id === dateMealId)
+
+        if (!oldMealPlanDate || !dateMeal) return
+        if (oldMealPlanDate.id === newMealPlanDate.id) return
+
+        // Remove date meal from old date
+        dispatch(mealPlanDateMealsChanged({
+            mealPlanId: mealPlan.id,
+            dateId: oldMealPlanDate.id,
+            meals: oldMealPlanDate?.meals.filter(({ id }) => id !== dateMealId)
+        }))
+
+        // Add date meal to new date
+        dispatch(mealPlanDateMealsChanged({
+            mealPlanId: mealPlan.id,
+            dateId: newMealPlanDate.id,
+            meals: [...newMealPlanDate.meals, dateMeal]
+        }))
     }
 
-    const breakfastRecipes = recipes.filter(({ id }) => breakfastRecipeIds.includes(id))
-    const lunchRecipes = recipes.filter(({ id }) => lunchRecipeIds.includes(id))
-    const dinnerRecipes = recipes.filter(({ id }) => dinnerRecipeIds.includes(id))
-
-    let selectedMealTypeTitle = ""
-    let selectedRecipeIds: string[] = []
-    switch (selectingMealType) {
-        case MealType.BREAKFAST:
-            selectedMealTypeTitle = "breakfast"
-            selectedRecipeIds = [...breakfastRecipeIds]
-            break
-        case MealType.LUNCH:
-            selectedMealTypeTitle = "lunch"
-            selectedRecipeIds = [...lunchRecipeIds]
-            break
-        case MealType.DINNER:
-            selectedMealTypeTitle = "dinner"
-            selectedRecipeIds = [...dinnerRecipeIds]
-            break                        
-    }
-
-    const breakfastMacros = breakfastRecipes.reduce((prev, curr) => ({
-        protein: prev.protein + curr.protein,
-        fats: prev.fats + curr.fats,
-        carbs: prev.carbs + curr.carbs,
-    }), { protein: 0, fats: 0, carbs: 0 })
-    const lunchMacros = lunchRecipes.reduce((prev, curr) => ({
-        protein: prev.protein + curr.protein,
-        fats: prev.fats + curr.fats,
-        carbs: prev.carbs + curr.carbs,
-    }), { protein: 0, fats: 0, carbs: 0 })
-    const dinnerMacros = dinnerRecipes.reduce((prev, curr) => ({
-        protein: prev.protein + curr.protein,
-        fats: prev.fats + curr.fats,
-        carbs: prev.carbs + curr.carbs,
-    }), { protein: 0, fats: 0, carbs: 0 })
-
-    // TODO - change droppable areas to days within the meal plan range
-    // TODO - allow duplicates of the same recipe in the meal plan
+    const prettyDateFormatter = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "long" })
+    const dayCount = getAmountOfDaysBetween(startDate, endDate)
+    let dates: Date[] = []
+    for (let i = 0; i <= dayCount; i++) dates.push(addDays(mealPlan.startDate, i))
 
     return (
         <>
             <RecipesPickerDialog
-                isOpen={selectingMealType !== null}
+                isOpen={selectingDateId !== null}
                 setIsOpen={(isOpen) => {
                     if (isOpen) return false
-                    setSelectingMealType(null)
+                    setSelectingDateId(null)
                 }}
-                title={`Add to ${selectingMealType ? getMealTypeTitle(selectingMealType).toLocaleLowerCase() : "meal"}`}
-                recipeIds={selectedRecipeIds}
+                title={`Add to ${selectingDateId ? prettyDateFormatter.format(getDateFromDateId(selectingDateId)) : ""} meal`}
                 onSave={(recipeIds) => {
-                    switch (selectingMealType) {
-                        case MealType.BREAKFAST:
-                            setBreakfastRecipeIds(recipeIds)
-                            break
-                        case MealType.LUNCH:
-                            setLunchRecipeIds(recipeIds)
-                            break
-                        case MealType.DINNER:
-                            setDinnerRecipeIds(recipeIds)
-                            break
-                    }
+                    if (selectingDateId === null) return
+
+                    let dateMealId = lastDateMealId
+
+                    let meals: IMealPlanDateMeal[] = []
+                    recipeIds.forEach(recipeId => {
+                        const recipe = recipes.find(({ id }) => id === recipeId)
+                        if (!recipe) return
+
+                        dateMealId++
+
+                        meals.push({
+                            id: dateMealId.toString(),
+                            recipeId,
+                            recipe,
+                            servingCount: 2 // TODO - make default configurable
+                        })
+                    })
+
+                    setLastDateMealId(dateMealId)
+
+                    const dateMeals = mealPlan.dates.find(date => date.id === selectingDateId)?.meals || []
+                    dispatch(mealPlanDateMealsChanged({ 
+                        mealPlanId: mealPlan.id, 
+                        dateId: selectingDateId, 
+                        meals: [...dateMeals, ...meals]
+                    }))
                 }}
             />
         
             <DndContext
                 onDragEnd={handleDragEnd}
             >
-                <div>
-                    <div className="mb-8">
-                        <div className="mb-2 flex items-end justify-between">
-                            <h2 className="text-lg font-semibold mr-2">Breakfast</h2>
-                            <div className="mr-4">
-                                <Macros {...breakfastMacros} />
+                {dates.map(date => {
+                    const dateId = getDateId(date)
+                    const dateMeals = mealPlan.dates.find(date => date.id === dateId)?.meals || []
+
+                    const nutrition: INutrition = dateMeals
+                        .reduce((prev, curr) => {
+                            const mealNutrition = transformNutritionByServing(curr.recipe.nutrition, curr.servingCount)                            
+
+                            return {
+                                calories: prev.calories + mealNutrition.calories,
+                                macros: {
+                                    protein: prev.macros.protein + mealNutrition.macros.protein,
+                                    fats: prev.macros.fats + mealNutrition.macros.fats,
+                                    carbs: prev.macros.carbs + mealNutrition.macros.carbs,
+                                }
+                            }
+                        }, {
+                            calories: 0,
+                            macros: {
+                                protein: 0,
+                                fats: 0,
+                                carbs: 0
+                            }
+                        })
+
+                    return (
+                        <div key={dateId} className="mb-8">
+                            <div className="mb-2 flex items-end justify-between">
+                                <div className="flex mr-2 gap-3 items-center">
+                                    {isToday(date) && <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />}
+                                    <h2 className="text-lg font-semibold">{prettyDateFormatter.format(date)}</h2>
+                                </div>
+                                <div className="mr-4 ml-auto">
+                                    <div className="flex gap-2">
+                                        <Badge className="font-mono font-light" variant="outline">{formatNutritionNumber(nutrition.calories)} <Flame /></Badge>
+                                        <Macros {...nutrition.macros} />
+                                    </div>
+                                </div>
+                            </div>
+                            <MealDropperDropper id={dateId} isPopulated={dateMeals.length > 0}>
+                                {dateMeals.map(dateMeal => (
+                                    <MealPlanOrganiserDragger 
+                                        key={dateMeal.id} 
+                                        mealPlanId={mealPlan.id}
+                                        dateId={dateId}
+                                        dateMeal={dateMeal} 
+                                    />
+                                ))}
+                            </MealDropperDropper>
+                            <div className="w-full border border-t-0 rounded-b">
+                                <Button
+                                    onClick={() => setSelectingDateId(dateId)}
+                                    variant="ghost"
+                                    className="w-full rounded-t-none rounded-b"
+                                >
+                                    <Plus />
+                                </Button>
                             </div>
                         </div>
-                        <MealDropperDropper id={MealType.BREAKFAST} isPopulated={breakfastRecipeIds.length > 0}>
-                            {breakfastRecipes.map(recipe => (
-                                <MealPlanOrganiserDragger key={recipe.id} recipe={recipe} />
-                            ))}
-                        </MealDropperDropper>
-                        <div className="w-full border border-t-0 rounded-b">
-                            <Button
-                                onClick={() => setSelectingMealType(MealType.BREAKFAST)}
-                                variant="ghost"
-                                className="w-full"
-                            >
-                                <Plus />
-                            </Button>
-                        </div>
-                    </div>
-                    <div className="mb-8">
-                        <div className="mb-2 flex items-end justify-between">
-                            <h2 className="text-lg font-semibold mr-2">Lunch</h2>
-                            <div className="mr-4">
-                                <Macros {...lunchMacros} />
-                            </div>
-                        </div>
-                        <MealDropperDropper id={MealType.LUNCH} isPopulated={lunchRecipeIds.length > 0}>
-                            {lunchRecipes.map(recipe => (
-                                <MealPlanOrganiserDragger key={recipe.id} recipe={recipe} />
-                            ))}
-                        </MealDropperDropper>
-                        <div className="w-full border border-t-0 rounded-b">
-                            <Button
-                                onClick={() => setSelectingMealType(MealType.LUNCH)}
-                                variant="ghost"
-                                className="w-full"
-                            >
-                                <Plus />
-                            </Button>
-                        </div>
-                    </div>
-                    <div className="mb-8">
-                        <div className="mb-2 flex items-end justify-between">
-                            <h2 className="text-lg font-semibold mr-2">Dinner</h2>
-                            <div className="mr-4">
-                                <Macros {...dinnerMacros} />
-                            </div>
-                        </div>
-                        <MealDropperDropper id={MealType.DINNER} isPopulated={dinnerRecipeIds.length > 0}>
-                            {dinnerRecipes.map(recipe => (
-                                <MealPlanOrganiserDragger key={recipe.id} recipe={recipe} />
-                            ))}
-                        </MealDropperDropper>
-                        <div className="w-full border border-t-0 rounded-b">
-                            <Button
-                                onClick={() => setSelectingMealType(MealType.DINNER)}
-                                variant="ghost"
-                                className="w-full"
-                            >
-                                <Plus />
-                            </Button>
-                        </div>
-                    </div>
-                </div>
+                    )
+                })}
             </DndContext>
         </>
     )

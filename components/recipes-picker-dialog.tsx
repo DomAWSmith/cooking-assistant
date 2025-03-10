@@ -8,7 +8,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useAppSelector } from "@/lib/hooks"
 import { RecipeSelect } from "@/components/recipes-select"
 
@@ -16,22 +16,18 @@ interface Props {
     isOpen: boolean,
     setIsOpen: (isOpen: boolean) => void
     title: string
-    recipeIds: string[]
     onSave: (recipeIds: string[]) => void
 }
 
-export function RecipesPickerDialog({ isOpen, setIsOpen, title, recipeIds, onSave }: Props) {
+export function RecipesPickerDialog({ isOpen, setIsOpen, title, onSave }: Props) {
     const [selectedRecipeIds, setSelectedRecipeIds] = useState<string[]>([])
-
-    useEffect(() => {
-        setSelectedRecipeIds(recipeIds)
-    }, [recipeIds])
 
     const recipes = useAppSelector(state => state.recipes)
     
     function onSubmit() {
         onSave(selectedRecipeIds)
         setIsOpen(false)
+        setSelectedRecipeIds([])
     }
 
     return (

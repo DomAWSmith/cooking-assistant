@@ -12,14 +12,11 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { getClosestUpcomingMealPlan } from "@/lib/utils"
 
 export default function MealPlans() {
   const mealPlans = useAppSelector(state => state.mealPlans)
   const recipes = useAppSelector(state => state.recipes)
-
-  const nextMealPlans = mealPlans
-    .slice()
-    .sort((a, b) => a.startDate - b.startDate)
 
   return (
     <SidebarProvider
@@ -31,7 +28,7 @@ export default function MealPlans() {
     >
       <AppSidebar />
       <SidebarInset>
-        <header className="md:hidden sticky top-0 flex shrink-0 items-center gap-2 border-b bg-background p-4 h-18">
+        <header className="md:hidden sticky top-0 flex shrink-0 items-center gap-2 border-b bg-background p-4 h-18 z-10">
           <SidebarTrigger className="-ml-1 md:hidden" />
           <Separator orientation="vertical" className="mr-2 h-4 md:hidden" />
           <Breadcrumb>
@@ -45,7 +42,7 @@ export default function MealPlans() {
         <div className="flex h-full w-full items-center justify-center p-4">
           <Chef 
             hasRecipes={recipes.length > 0}
-            nextMealPlan={nextMealPlans[0] || null} 
+            nextMealPlan={getClosestUpcomingMealPlan(mealPlans)} 
           />
         </div>
       </SidebarInset>

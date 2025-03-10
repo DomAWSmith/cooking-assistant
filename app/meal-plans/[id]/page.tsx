@@ -14,7 +14,7 @@ import { MealPlanShoppingList } from "@/components/meal-plan-shopping-list"
 export default function Page() {
   const { id } = useParams<{ id: string }>()
 
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch()
 
   const mealPlan = useAppSelector(state => state.mealPlans.find(i => i.id === id))
   const recipes = useAppSelector(state => state.recipes)
@@ -46,7 +46,7 @@ export default function Page() {
               <DialogRename 
                 originalTitle={pageName}
                 onSave={(title) => {
-                  dispatch(mealPlanRenamed({ id, title }))
+                  dispatch(mealPlanRenamed({ mealPlanId: id, title }))
                 }}
               />
             </BreadcrumbPage>
@@ -64,7 +64,7 @@ export default function Page() {
             toDate={endDate}
             onSave={(startDate, endDate) => {
               dispatch(mealPlanDateRangeChanged({
-                id,
+                mealPlanId: id,
                 startDate: startDate.getTime(),
                 endDate: endDate.getTime()
               }))
@@ -73,11 +73,14 @@ export default function Page() {
         </div>
       </div>
 
-      <div className="p-4">
-        <MealPlanOrganiser 
-          recipes={recipes} 
-        />
-      </div>
+      {mealPlan && (
+        <div className="p-4">
+          <MealPlanOrganiser 
+            mealPlan={mealPlan}
+            recipes={recipes} 
+          />
+        </div>
+      )}
     </MealPlanSidebar>
   )
 }

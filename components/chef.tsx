@@ -2,7 +2,9 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import ChefFace from "@/components/chef-face"
 import { IMealPlan } from "@/types/IMealPlan"
-import { isAfterToday, relativeDate } from "@/lib/utils"
+import { getAmountOfDaysBetween, isActiveMealPlan, relativeDate } from "@/lib/utils"
+import { startOfToday } from "date-fns"
+import { CookingPot, NotebookPen } from "lucide-react"
 
 interface Props {
     hasRecipes: boolean
@@ -11,8 +13,8 @@ interface Props {
 
 export default function Chef({ hasRecipes, nextMealPlan }: Props) {
     const now = new Date()
-    const formatter = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long" })
-    const formattedDate = formatter.format(now)
+    const dateFormatter = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long" })
+    const formattedDate = dateFormatter.format(now)
 
     const hour = now.getHours()
     let welcomeMessage = ""
@@ -24,23 +26,37 @@ export default function Chef({ hasRecipes, nextMealPlan }: Props) {
         welcomeMessage = "Good evening"
     }
 
+    let actionIcon = <></>
     let actionLink = ""
     let actionLabel = ""
     let actionMessage = ""
     if (!hasRecipes) {
+        actionIcon = <NotebookPen />
         actionLink = `/recipes/create`
         actionLabel = "Create your first recipe"
         actionMessage = `Once you've created some recipes, you'll be able to plan meals`
     } else if (nextMealPlan !== null) {
+        actionIcon = <CookingPot />
         actionLink = `/meal-plans/${nextMealPlan.id}`
         actionLabel = "View meal plan"
 
-        if (isAfterToday(now, new Date(nextMealPlan.startDate))) {
-            actionMessage = `You have ${nextMealPlan.title}</strong> ${relativeDate(now, new Date(nextMealPlan.startDate))}`
+        if (isActiveMealPlan(nextMealPlan)) {
+            const daysTotal = getAmountOfDaysBetween(new Date(nextMealPlan.startDate), new Date(nextMealPlan.endDate))
+            const daysLeft = getAmountOfDaysBetween(startOfToday(), new Date(nextMealPlan.endDate))
+
+            if (daysTotal === daysLeft) {
+                actionMessage = `You have <strong>${nextMealPlan.title}</strong> starting today for ${daysLeft} days`
+            } else if (daysLeft) {
+                actionMessage = `Today is your last day of <strong>${nextMealPlan.title}</strong>`
+            } else {
+                actionMessage = `You have ${daysLeft} of ${daysTotal} days left of <strong>${nextMealPlan.title}</strong>`
+            }
+
         } else {
-            actionMessage = `You currently have <strong>${nextMealPlan.title}</strong> ending ${relativeDate(now, new Date(nextMealPlan.endDate))}`
+            actionMessage = `You have <strong>${nextMealPlan.title}</strong> ${relativeDate(now, new Date(nextMealPlan.startDate))}`
         }
     } else {
+        actionIcon = <CookingPot />
         actionLink = `/meal-plans/create`
         actionLabel = "Create your first meal plan"
         actionMessage = `You have no meals planned`
@@ -57,7 +73,8 @@ export default function Chef({ hasRecipes, nextMealPlan }: Props) {
             </div>
             <Button variant="outline" asChild>
                 <Link href={actionLink}>
-                    {actionLabel}
+                    {actionIcon}
+                    <span>{actionLabel}</span>
                 </Link>
             </Button>
         </div>

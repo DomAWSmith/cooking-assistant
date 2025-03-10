@@ -1,5 +1,4 @@
 import { useDraggable } from "@dnd-kit/core"
-import { MealPlanDateMealDraggable } from "@/components/meal-plan-date-meal-draggable"
 import { IMealPlanDateMeal } from "@/types/IMealPlanDateMeal"
 import { Recipe } from "@/components/recipe"
 import { GripVertical, Minus, Plus } from "lucide-react"

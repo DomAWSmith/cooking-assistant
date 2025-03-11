@@ -63,13 +63,13 @@ export default function Chef({ hasRecipes, nextMealPlan }: Props) {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center">
-            <ChefFace className="mb-6 -ml-4" />
+        <div className="flex flex-col items-center justify-center relative z-10">
+            <ChefFace className="mb-6" />
             <div className="relative mb-4">
-                <div className="bg-black w-4 h-4 absolute bottom-full left-1/2 -translate-x-1/2 translate-y-1/2 rotate-45 " />
-                <div className="bg-black ml-2 px-4 pt-3 pb-4 text-white rounded-lg text-lg max-w-xl"
+                <div className="bg-black px-4 pt-3 pb-4 text-white rounded-lg text-lg max-w-xl border-3 relative z-10 border-transparent dark:border-white"
                     dangerouslySetInnerHTML={{ __html: `${welcomeMessage}, it's ${formattedDate}! ${actionMessage}.` }}
                 />
+                <div className="bg-black pointer-events-none w-4 h-4 absolute bottom-full left-1/2 -translate-x-1/2 translate-y-1/2 rotate-45 dark:bg-white" />
             </div>
             <Button variant="outline" asChild>
                 <Link href={actionLink}>

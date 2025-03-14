@@ -56,7 +56,10 @@ export default function MealPlanOrganiserDragger({ mealPlanId, dateId, dateMeal 
                     </button>
 
                     <div className="flex w-full flex-col items-start gap-2 pl-1 p-4">
-                        <Recipe separateNutrition={false} recipe={servingsRecipe} />
+                        <Recipe 
+                            expanded={true} 
+                            recipe={servingsRecipe} 
+                        />
                         <div className="pt-4">
                             <ServingPicker
                                 count={servingCount}

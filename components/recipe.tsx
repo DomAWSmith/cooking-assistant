@@ -5,17 +5,17 @@ import { Macros } from "@/components/macros"
 
 interface Props {
   recipe: IRecipe
-  separateNutrition?: boolean
+  expanded?: boolean
 }
 
-export function Recipe({ recipe, separateNutrition = true }: Props) {
+export function Recipe({ recipe, expanded = false }: Props) {
   return (
     <>
       <div className="flex w-full items-center justify-between gap-2">
         <div className="overflow-hidden truncate max-w-48 font-semibold">{recipe.name}</div>
         <div className="text-xs shrink-0">{recipe.date}</div>
       </div>
-      <div className={`flex w-full gap-2 pt-2 ${separateNutrition ? "justify-between" : "justify-end"}`}>
+      <div className={`flex w-full gap-2 pt-2 ${expanded ? "justify-end" : "justify-between"}`}>
         <Badge className="font-mono font-light" variant="outline">{recipe.nutrition.calories} <Flame /></Badge>
         <Macros macros={recipe.nutrition.macros} />
       </div>

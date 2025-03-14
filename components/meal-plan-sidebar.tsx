@@ -39,7 +39,7 @@ export default function MealPlanSidebar({ children, breadcrumbs, showMobileAddNe
             id: crypto.randomUUID(),
             title: "",
             startDate: startDate.getTime(),
-            endDate: addDays(startDate, 7).getTime(),
+            endDate: addDays(startDate, 6).getTime(),
             currentIngredientCount: 0,
             dates: []
         }))

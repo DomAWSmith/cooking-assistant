@@ -55,27 +55,29 @@ export default function MealPlanOrganiserDragger({ mealPlanId, dateId, dateMeal 
 
                     <div className="flex w-full flex-col items-start gap-2 pl-1 p-4">
                         <Recipe separateNutrition={false} recipe={servingsRecipe} />
-                        <ServingPicker
-                            count={servingCount}
-                            min={minServings}
-                            max={maxServings}
-                            onDecrement={() => {
-                                dispatch(mealPlanDateMealServingChanged({
-                                    mealPlanId,
-                                    dateId,
-                                    mealId: dateMeal.id,
-                                    servingCount: Math.max(servingCount - 1, minServings)
-                                }))
-                            }}
-                            onIncrement={() => {
-                                dispatch(mealPlanDateMealServingChanged({
-                                    mealPlanId,
-                                    dateId,
-                                    mealId: dateMeal.id,
-                                    servingCount: Math.min(servingCount + 1, maxServings)
-                                }))
-                            }}
-                        />
+                        <div className="pt-4">
+                            <ServingPicker
+                                count={servingCount}
+                                min={minServings}
+                                max={maxServings}
+                                onDecrement={() => {
+                                    dispatch(mealPlanDateMealServingChanged({
+                                        mealPlanId,
+                                        dateId,
+                                        mealId: dateMeal.id,
+                                        servingCount: Math.max(servingCount - 1, minServings)
+                                    }))
+                                }}
+                                onIncrement={() => {
+                                    dispatch(mealPlanDateMealServingChanged({
+                                        mealPlanId,
+                                        dateId,
+                                        mealId: dateMeal.id,
+                                        servingCount: Math.min(servingCount + 1, maxServings)
+                                    }))
+                                }}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

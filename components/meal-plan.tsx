@@ -33,7 +33,7 @@ export function MealPlan(mealPlan: IMealPlan) {
       className={`flex ${pathname === href ? "bg-sidebar-accent" : "text-sidebar-accent-foreground"} hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap last:border-b-0`}
     >
       <div className="flex w-full items-center justify-between gap-2">
-        <div className="overflow-hidden truncate max-w-48">{getMealPlanTitle(mealPlan)}</div>
+        <div className="overflow-hidden truncate max-w-48 font-semibold">{getMealPlanTitle(mealPlan)}</div>
         <div className="text-xs shrink-0">
           {dateFormatter.formatRange(mealPlan.startDate, mealPlan.endDate)}
         </div>

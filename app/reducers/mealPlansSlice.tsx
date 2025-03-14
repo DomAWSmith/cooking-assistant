@@ -24,7 +24,7 @@ const initialState: IMealPlan[] = [
         "id": "1",
         "title": "Meal plan 1",
         "startDate": yesterday.getTime(),
-        "endDate": addDays(yesterday, 5).getTime(),
+        "endDate": addDays(yesterday, 2).getTime(),
         "currentIngredientCount": 0,
         "dates": []
     },

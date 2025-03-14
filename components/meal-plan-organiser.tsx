@@ -82,15 +82,11 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
 
                     let meals: IMealPlanDateMeal[] = []
                     recipeIds.forEach(recipeId => {
-                        const recipe = recipes.find(({ id }) => id === recipeId)
-                        if (!recipe) return
-
                         dateMealId++
 
                         meals.push({
                             id: dateMealId.toString(),
                             recipeId,
-                            recipe,
                             servingCount: 2 // TODO - make default configurable
                         })
                     })
@@ -118,7 +114,10 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
 
                         const nutrition: INutrition = dateMeals
                             .reduce((prev, curr) => {
-                                const mealNutrition = transformNutritionByServing(curr.recipe.nutrition, curr.servingCount)                            
+                                const recipe = recipes.find(({ id }) => id === curr.recipeId)
+                                if (!recipe) return prev
+
+                                const mealNutrition = transformNutritionByServing(recipe.nutrition, curr.servingCount)                            
 
                                 return {
                                     calories: prev.calories + mealNutrition.calories,

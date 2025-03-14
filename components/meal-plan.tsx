@@ -1,14 +1,17 @@
 "use client"
 
 import { IMealPlan } from "@/types/IMealPlan"
-import { Badge } from "./ui/badge"
+import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { CookingPot, ListTodo } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { getMealPlanTitle } from "@/lib/utils"
+import { useAppSelector } from "@/lib/hooks"
 
 export function MealPlan(mealPlan: IMealPlan) {
   const pathname = usePathname()
+
+  const recipes = useAppSelector(state => state.recipes)
 
   const dateFormatter = new Intl.DateTimeFormat("en-GB", {
     month: "short",
@@ -23,7 +26,10 @@ export function MealPlan(mealPlan: IMealPlan) {
     mealCount += date.meals.length
 
     date.meals.forEach(meal => {
-      totalIngredientCount += meal.recipe.ingredients.length
+      const recipe = recipes.find(({ id }) => id === meal.recipeId)
+      if (!recipe) return
+
+      totalIngredientCount += recipe.ingredients.length
     })
   })
 

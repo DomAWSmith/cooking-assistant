@@ -3,7 +3,7 @@ import { IMealPlanDateMeal } from "@/types/IMealPlanDateMeal"
 import { Recipe } from "@/components/recipe"
 import { GripVertical } from "lucide-react"
 import { transformNutritionByServing } from "@/lib/utils"
-import { useAppDispatch } from "@/lib/hooks"
+import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { mealPlanDateMealServingChanged } from "@/app/reducers/mealPlansSlice"
 import ServingPicker from "@/components/serving-picker"
 
@@ -23,8 +23,10 @@ export default function MealPlanOrganiserDragger({ mealPlanId, dateId, dateMeal 
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
     } : undefined
 
+    const { recipeId, servingCount } = dateMeal
+    const recipe = useAppSelector(state => state.recipes.find(({ id }) => id === recipeId))
+    if (!recipe) return null
 
-    const { recipe, servingCount } = dateMeal
     const { nutrition } = recipe
 
     const servingsRecipe = {

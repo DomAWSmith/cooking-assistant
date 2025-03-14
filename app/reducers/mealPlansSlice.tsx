@@ -114,6 +114,16 @@ const mealPlansSlice = createSlice({
 
         },
         mealPlanDateMealServingChanged: (state, { payload: { mealPlanId, dateId, mealId, servingCount } }: PayloadAction<{ mealPlanId: string, dateId: string, mealId: string, servingCount: number }>) => {
+            if (servingCount <= 0) {
+                return state.map(mealPlan => mealPlan.id === mealPlanId ? {
+                    ...mealPlan,
+                    dates: mealPlan.dates.map(date => date.id === dateId ? {
+                        ...date,
+                        meals: date.meals.filter(meal => meal.id !== mealId)
+                    } : date),
+                } : mealPlan)
+            }
+
             return state.map(mealPlan => mealPlan.id === mealPlanId ? {
                 ...mealPlan,
                 dates: mealPlan.dates.map(date => date.id === dateId ? {

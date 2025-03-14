@@ -1,7 +1,7 @@
 import { useDraggable } from "@dnd-kit/core"
 import { IMealPlanDateMeal } from "@/types/IMealPlanDateMeal"
 import { Recipe } from "@/components/recipe"
-import { GripVertical, Minus, Plus } from "lucide-react"
+import { GripVertical, Minus, Plus, Trash2 } from "lucide-react"
 import { transformNutritionByServing } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useAppDispatch } from "@/lib/hooks"
@@ -32,8 +32,9 @@ export default function MealPlanOrganiserDragger({ mealPlanId, dateId, dateMeal 
         nutrition: transformNutritionByServing(nutrition, servingCount)
     }
 
-    const minServings = 1
+    const minServings = 0
     const maxServings = 100
+    const canDelete = servingCount <= minServings + 1
 
     return (
         <div
@@ -55,32 +56,34 @@ export default function MealPlanOrganiserDragger({ mealPlanId, dateId, dateMeal 
 
                     <div className="flex w-full flex-col items-start gap-2 pl-1 p-4">
                         <Recipe separateNutrition={false} recipe={servingsRecipe} />
+                        <div className="w-full py-2 flex items-center gap-2 justify-start">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className={canDelete ? "text-destructive-foreground" : ""}
+                                onClick={() => dispatch(mealPlanDateMealServingChanged({
+                                    mealPlanId,
+                                    dateId,
+                                    mealId: dateMeal.id,
+                                    servingCount: Math.max(servingCount - 1, minServings)
+                                }))}
+                            >
+                                {canDelete ? <Trash2 /> : <Minus />}
+                            </Button>
+                            <div className="px-2">{servingCount} {`${servingCount === 1 ? "serving" : "servings"}`}</div>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className={`${servingCount < maxServings ? "" : "opacity-50"} transition-all`}
+                                onClick={() => dispatch(mealPlanDateMealServingChanged({
+                                    mealPlanId,
+                                    dateId,
+                                    mealId: dateMeal.id,
+                                    servingCount: Math.min(servingCount + 1, maxServings)
+                                }))}
+                            ><Plus /></Button>
+                        </div>
                     </div>
-                </div>
-                <div className="w-full py-2 flex items-center gap-2 justify-center bg-slate-200/50 dark:bg-slate-200/10">
-                    <Button
-                        size="sm"
-                        variant="outline"
-                        className={`${servingCount > minServings ? "" : "opacity-50"} transition-all`}
-                        onClick={() => dispatch(mealPlanDateMealServingChanged({
-                            mealPlanId,
-                            dateId,
-                            mealId: dateMeal.id,
-                            servingCount: Math.max(servingCount - 1, minServings)
-                        }))}
-                    ><Minus /></Button>
-                    <div className="px-2">{servingCount} servings</div>
-                    <Button
-                        size="sm"
-                        variant="outline"
-                        className={`${servingCount < maxServings ? "" : "opacity-50"} transition-all`}
-                        onClick={() => dispatch(mealPlanDateMealServingChanged({
-                            mealPlanId,
-                            dateId,
-                            mealId: dateMeal.id,
-                            servingCount: Math.min(servingCount + 1, maxServings)
-                        }))}
-                    ><Plus /></Button>
                 </div>
             </div>
         </div>

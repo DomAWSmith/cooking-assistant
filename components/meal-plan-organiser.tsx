@@ -109,84 +109,86 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
             <DndContext
                 onDragEnd={handleDragEnd}
             >
-                {dates.map(date => {
-                    const dateId = getDateId(date)
-                    const mealDate = mealPlan.dates.find(date => date.id === dateId)
-                    const dateMeals = mealDate?.meals || []
-                    const dateNote = mealDate?.note || ""
+                <div className="max-w-2xl">
+                    {dates.map(date => {
+                        const dateId = getDateId(date)
+                        const mealDate = mealPlan.dates.find(date => date.id === dateId)
+                        const dateMeals = mealDate?.meals || []
+                        const dateNote = mealDate?.note || ""
 
-                    const nutrition: INutrition = dateMeals
-                        .reduce((prev, curr) => {
-                            const mealNutrition = transformNutritionByServing(curr.recipe.nutrition, curr.servingCount)                            
+                        const nutrition: INutrition = dateMeals
+                            .reduce((prev, curr) => {
+                                const mealNutrition = transformNutritionByServing(curr.recipe.nutrition, curr.servingCount)                            
 
-                            return {
-                                calories: prev.calories + mealNutrition.calories,
-                                macros: {
-                                    protein: prev.macros.protein + mealNutrition.macros.protein,
-                                    fats: prev.macros.fats + mealNutrition.macros.fats,
-                                    carbs: prev.macros.carbs + mealNutrition.macros.carbs,
+                                return {
+                                    calories: prev.calories + mealNutrition.calories,
+                                    macros: {
+                                        protein: prev.macros.protein + mealNutrition.macros.protein,
+                                        fats: prev.macros.fats + mealNutrition.macros.fats,
+                                        carbs: prev.macros.carbs + mealNutrition.macros.carbs,
+                                    }
                                 }
-                            }
-                        }, {
-                            calories: 0,
-                            macros: {
-                                protein: 0,
-                                fats: 0,
-                                carbs: 0
-                            }
-                        })
+                            }, {
+                                calories: 0,
+                                macros: {
+                                    protein: 0,
+                                    fats: 0,
+                                    carbs: 0
+                                }
+                            })
 
-                    return (
-                        <div key={dateId} className="mb-8">
-                            <div className="mb-2 flex flex-col justify-between lg:flex-row lg:items-end">
-                                <div className="flex flex-col">
-                                    <div className="flex mr-2 gap-2 items-center">
-                                        {isToday(date) && <div className="w-2 h-2  mr-1 bg-green-500 rounded-full animate-pulse" />}
-                                        <h2 className="text-lg font-semibold">{prettyDateFormatter.format(date)}</h2>
-                                        <MealPlanDateNoteDialog 
-                                            originalNote={dateNote}
-                                            onSave={(note => {
-                                                dispatch(mealPlanDateNoteChanged({ mealPlanId: mealPlan.id, dateId, note }))
-                                            })}
-                                        />
+                        return (
+                            <div key={dateId} className="mb-8">
+                                <div className="mb-2 flex flex-col justify-between lg:flex-row lg:items-end">
+                                    <div className="flex flex-col">
+                                        <div className="flex mr-2 gap-2 items-center">
+                                            {isToday(date) && <div className="w-2 h-2  mr-1 bg-green-500 rounded-full animate-pulse" />}
+                                            <h2 className="text-lg font-semibold">{prettyDateFormatter.format(date)}</h2>
+                                            <MealPlanDateNoteDialog 
+                                                originalNote={dateNote}
+                                                onSave={(note => {
+                                                    dispatch(mealPlanDateNoteChanged({ mealPlanId: mealPlan.id, dateId, note }))
+                                                })}
+                                            />
+                                        </div>
+                                        {dateNote && (
+                                            <div className="italic text-sm opacity-70">
+                                                {dateNote}
+                                            </div>
+                                        )}
                                     </div>
-                                    {dateNote && (
-                                        <div className="italic text-sm opacity-70">
-                                            {dateNote}
+                                    {dateMeals.length > 0 && (
+                                        <div className="ml-auto mt-2">
+                                            <div className="flex gap-2 justify-end">
+                                                <Badge className="font-mono font-light" variant="outline">{formatNutritionNumber(nutrition.calories)} <Flame /></Badge>
+                                                <Macros macros={nutrition.macros} />
+                                            </div>
                                         </div>
                                     )}
                                 </div>
-                                {dateMeals.length > 0 && (
-                                    <div className="ml-auto mt-2">
-                                        <div className="flex gap-2 justify-end">
-                                            <Badge className="font-mono font-light" variant="outline">{formatNutritionNumber(nutrition.calories)} <Flame /></Badge>
-                                            <Macros macros={nutrition.macros} />
-                                        </div>
-                                    </div>
-                                )}
+                                <MealDropperDropper id={dateId} isPopulated={dateMeals.length > 0}>
+                                    {dateMeals.map(dateMeal => (
+                                        <MealPlanOrganiserDragger 
+                                            key={dateMeal.id} 
+                                            mealPlanId={mealPlan.id}
+                                            dateId={dateId}
+                                            dateMeal={dateMeal} 
+                                        />
+                                    ))}
+                                </MealDropperDropper>
+                                <div className="w-full border border-t-0 rounded-b">
+                                    <Button
+                                        onClick={() => setSelectingDateId(dateId)}
+                                        variant="ghost"
+                                        className="w-full rounded-t-none rounded-b"
+                                    >
+                                        <Plus />
+                                    </Button>
+                                </div>
                             </div>
-                            <MealDropperDropper id={dateId} isPopulated={dateMeals.length > 0}>
-                                {dateMeals.map(dateMeal => (
-                                    <MealPlanOrganiserDragger 
-                                        key={dateMeal.id} 
-                                        mealPlanId={mealPlan.id}
-                                        dateId={dateId}
-                                        dateMeal={dateMeal} 
-                                    />
-                                ))}
-                            </MealDropperDropper>
-                            <div className="w-full border border-t-0 rounded-b">
-                                <Button
-                                    onClick={() => setSelectingDateId(dateId)}
-                                    variant="ghost"
-                                    className="w-full rounded-t-none rounded-b"
-                                >
-                                    <Plus />
-                                </Button>
-                            </div>
-                        </div>
-                    )
-                })}
+                        )
+                    })}
+                </div>
             </DndContext>
         </>
     )

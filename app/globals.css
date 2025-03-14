@@ -52,6 +52,24 @@
   --color-carbs-foreground: var(--carbs-foreground);
 }
 
+@theme {
+  --animate-wiggle: wiggle 1s infinite;
+
+  @keyframes wiggle {
+    to {
+      transform: rotate(-5deg);
+    }
+
+    50% {
+      transform: rotate(5deg);
+    }
+
+    from {
+      transform: rotate(-5deg);
+    }
+  }
+}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -143,37 +161,5 @@
   }
   body {
     @apply bg-background text-foreground;
-  }
-}
-
-.chef .a,
-.chef .c {
-  fill: #fff;
-  stroke: #000;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 8px;
-}
-
-.chef .c {
-  fill: none
-}
-
-.chef .moustache {
-  animation: moustache 1s infinite;
-  transform-origin: 55% 65%;
-}
-
-@keyframes moustache {
-  to {
-    transform: rotate(-5deg);
-  }
-
-  50% {
-    transform: rotate(5deg);
-  }
-
-  from {
-    transform: rotate(-5deg);
   }
 }

@@ -56,7 +56,7 @@ export function DatePickerWithRange({ fromDate, toDate, onSave }: Props) {
                         )}
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="end">
+                <PopoverContent className="w-auto p-0" align="end" blockOutside={true}>
                     <Calendar
                         mode="range"
                         defaultMonth={date?.from}

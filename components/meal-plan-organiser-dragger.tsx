@@ -2,20 +2,22 @@ import { useDraggable } from "@dnd-kit/core"
 import { IMealPlanDateMeal } from "@/types/IMealPlanDateMeal"
 import { Recipe } from "@/components/recipe"
 import { GripVertical } from "lucide-react"
-import { transformNutritionByServing } from "@/lib/utils"
+import { getRecipeNutritionByServing } from "@/lib/utils"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { mealPlanDateMealServingChanged } from "@/app/reducers/mealPlansSlice"
-import { IMealPlanIngredient } from "@/types/IMealPlanIngredient"
+import { IShoppingIngredient } from "@/types/IShoppingIngredient"
 
 interface Props {
     mealPlanId: string
-    dateIngredients: IMealPlanIngredient[]
+    dateIngredients: IShoppingIngredient[]
     dateId: string
     dateMeal: IMealPlanDateMeal
 }
 
 export default function MealPlanOrganiserDragger({ mealPlanId, dateIngredients, dateId, dateMeal }: Props) {
     const dispatch = useAppDispatch()
+
+    const ingredients = useAppSelector(state => state.ingredients)
 
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
         id: dateMeal.id,
@@ -28,11 +30,9 @@ export default function MealPlanOrganiserDragger({ mealPlanId, dateIngredients, 
     const recipe = useAppSelector(state => state.recipes.find(({ id }) => id === recipeId))
     if (!recipe) return null
 
-    const { nutrition } = recipe
-
     const servingsRecipe = {
         ...recipe,
-        nutrition: transformNutritionByServing(nutrition, servingCount)
+        nutrition: getRecipeNutritionByServing(recipe, ingredients, servingCount)
     }
 
     const minServings = 0

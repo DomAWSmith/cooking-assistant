@@ -5,19 +5,19 @@ import MealPlanOrganiserDragger from "@/components/meal-plan-organiser-dragger"
 import { useState } from "react"
 import { RecipesPickerDialog } from "./recipes-picker-dialog"
 import { Button } from "./ui/button"
-import { Edit, Flame, Plus } from "lucide-react"
-import { formatNutritionNumber, getAmountOfDaysBetween, getDateId, transformNutritionByServing, weekDayFormatter } from "@/lib/utils"
+import { Flame, Plus } from "lucide-react"
+import { formatNutritionNumber, getAmountOfDaysBetween, getDateId, getRecipeNutritionByServing, weekDayFormatter } from "@/lib/utils"
 import { Macros } from "./macros"
 import { addDays, isToday } from "date-fns"
 import { IMealPlan } from "@/types/IMealPlan"
-import { useAppDispatch } from "@/lib/hooks"
+import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { mealPlanDateMealsChanged, mealPlanDateNoteChanged } from "@/app/reducers/mealPlansSlice"
 import { IMealPlanDateMeal } from "@/types/IMealPlanDateMeal"
 import { Badge } from "./ui/badge"
 import { INutrition } from "@/types/INutrition"
 import { MealPlanDateNoteDialog } from "@/components/meal-plan-date-note-dialog"
-import { IMealPlanIngredient } from "@/types/IMealPlanIngredient"
 import { IMealPlanDate } from "@/types/IMealPlanDate"
+import { IShoppingIngredient } from "@/types/IShoppingIngredient"
 
 interface Props {
     mealPlan: IMealPlan
@@ -27,6 +27,8 @@ interface Props {
 export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
     const dispatch = useAppDispatch()
 
+    const ingredients = useAppSelector(state => state.ingredients)
+    
     const [lastDateMealId, setLastDateMealId] = useState(0)
     const [selectingDateId, setSelectingDateId] = useState<string | null>(null)
 
@@ -64,21 +66,21 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
     }
 
     // TODO - make an editable list and load it here
-    let mealPlanIngredients: IMealPlanIngredient[] = ([
+    let shoppingIngredients: IShoppingIngredient[] = ([
         {
-            id: "2",
-            name: "Ingredient 2",
+            id: "1",
+            ingredientId: "2",
             expiryDate: addDays(startDate, 1).getTime(),
             quantity: 10
         }
-    ] as IMealPlanIngredient[])// TODO - remove `as` once we're reading from a source
+    ] as IShoppingIngredient[])// TODO - remove `as` once we're reading from a source
         .sort((a, b) => (a.expiryDate || 0) - (b.expiryDate || 0))
 
     const dayCount = getAmountOfDaysBetween(startDate, endDate)
     let mealDates: { 
         date: Date, 
         mealDate?: IMealPlanDate,
-        dateIngredients: IMealPlanIngredient[] 
+        dateIngredients: IShoppingIngredient[] 
         nutrition: INutrition
     }[] = []
     for (let i = 0; i <= dayCount; i++) {
@@ -97,13 +99,13 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
             }
         }
 
-        let dateIngredients: IMealPlanIngredient[] = []
+        let dateIngredients: IShoppingIngredient[] = []
         mealDateMeals.forEach(({ recipeId, servingCount }) => {
             const recipe = recipes.find(({ id }) => id === recipeId)
             if (!recipe) return
 
             // total up nutrition
-            const mealNutrition = transformNutritionByServing(recipe.nutrition, servingCount)
+            const mealNutrition = getRecipeNutritionByServing(recipe, ingredients, servingCount)
             nutrition = {
                 calories: nutrition.calories + mealNutrition.calories,
                 macros: {
@@ -114,30 +116,30 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
             }
 
             // subtract from ingredients for each day and it's meals by serving
-            mealPlanIngredients = mealPlanIngredients.map(mealPlanIngredient => {
-                const _mealPlanIngredient = { ...mealPlanIngredient }
+            shoppingIngredients = shoppingIngredients.map(shoppingIngredient => {
+                const _shoppingIngredient = { ...shoppingIngredient }
 
                 recipe.ingredients.forEach(recipeIngredient => {
-                    if (mealPlanIngredient.id !== recipeIngredient.id) return
+                    if (shoppingIngredient.id !== recipeIngredient.id) return
 
-                    const mealPlanIngredientCount = mealPlanIngredient.quantity
+                    const shoppingIngredientCount = shoppingIngredient.quantity
                     const recipeIngredientQtyReq = recipeIngredient.quantity * servingCount
-                    const ingredientQtyUsed = Math.min(mealPlanIngredientCount, recipeIngredientQtyReq)
-                    const mealPlanIngredientQtyLeft = mealPlanIngredientCount - recipeIngredientQtyReq
-                    const recipeIngredientQtyLeft = Math.max(recipeIngredientQtyReq - mealPlanIngredientCount, 0)
+                    const ingredientQtyUsed = Math.min(shoppingIngredientCount, recipeIngredientQtyReq)
+                    const shoppingIngredientQtyLeft = shoppingIngredientCount - recipeIngredientQtyReq
+                    const recipeIngredientQtyLeft = Math.max(recipeIngredientQtyReq - shoppingIngredientCount, 0)
 
                     dateIngredients.push({
-                        id: recipeIngredient.id,
-                        name: mealPlanIngredient.name,
+                        id: shoppingIngredient.id,
+                        ingredientId: recipeIngredient.id,
                         quantity: recipeIngredientQtyLeft > 0 ? -recipeIngredientQtyLeft : ingredientQtyUsed,
-                        expiryDate: mealPlanIngredient.expiryDate
+                        expiryDate: shoppingIngredient.expiryDate
                     })
 
-                    _mealPlanIngredient.quantity = mealPlanIngredientQtyLeft
+                    _shoppingIngredient.quantity = shoppingIngredientQtyLeft
 
                 })
 
-                return _mealPlanIngredient
+                return _shoppingIngredient
             })
 
         })

@@ -3,31 +3,38 @@ import { IRecipe } from "@/types/IRecipe"
 import { Badge } from "@/components/ui/badge"
 import { Macros } from "@/components/macros"
 import ServingPicker, { Props as ServingPickerProps } from "@/components/serving-picker"
-import { getDateFromDateId, weekDayFormatter } from "@/lib/utils"
-import { IMealPlanIngredient } from "@/types/IMealPlanIngredient"
+import { getDateFromDateId, getRecipeNutritionByServing } from "@/lib/utils"
+import { IShoppingIngredient } from "@/types/IShoppingIngredient"
+import { useAppSelector } from "@/lib/hooks"
 
 interface Props {
   recipe: IRecipe
   mealData?: {
     serving: ServingPickerProps
-    dateIngredients: IMealPlanIngredient[]
+    dateIngredients: IShoppingIngredient[]
     dateId: string
   }
 }
 
 export function Recipe({ recipe, mealData }: Props) {
+  const ingredients = useAppSelector(state => state.ingredients)
+  const nutrition = getRecipeNutritionByServing(recipe, ingredients, mealData?.serving?.count || 1)
+
   if (mealData) {
     const { serving, dateIngredients, dateId } = mealData
     const date = getDateFromDateId(dateId)
 
     let ingredientAlerts: { id: string, name: string, message: string }[] = []
 
-    recipe.ingredients.forEach(({ id, name, quantity }) => {
+    recipe.ingredients.forEach(({ id, quantity }) => {
+      const ingredient = ingredients.find(ingredient => ingredient.id === id)
+      if (!ingredient) return
+
       const dateIngredient = dateIngredients.find((dateIngredients => dateIngredients.id === id))
       if (!dateIngredient) {
         ingredientAlerts.push({
           id: `${id}-required`,
-          name,
+          name: ingredient.name,
           message: "required"
         })
         return;
@@ -36,22 +43,13 @@ export function Recipe({ recipe, mealData }: Props) {
       if (dateIngredient.quantity < quantity) {
         ingredientAlerts.push({
           id: `${id}-insufficient`,
-          name,
+          name: ingredient.name,
           message: `needs ${quantity - dateIngredient.quantity}g more`
         })
         return;
       }
     })
 
-    ingredientAlerts = [...ingredientAlerts, ...dateIngredients
-      .filter(({ id }) => recipe.ingredients.map(({ id }) => id).includes(id))
-      .filter(({ expiryDate }) => expiryDate ? expiryDate < date.getTime() : false)
-      .map(({ id, name, expiryDate }) => ({
-        id: `${id}-expiry`,
-        name,
-        message: `expires ${weekDayFormatter.format(expiryDate)}`
-      }))
-    ]
 
     return (
       <div className="flex w-full flex-col gap-2">
@@ -74,8 +72,8 @@ export function Recipe({ recipe, mealData }: Props) {
           </div>
         )}
         <div className="flex gap-2 justify-end">
-          <Badge className="font-mono font-light" variant="outline">{recipe.nutrition.calories} <Flame /></Badge>
-          <Macros macros={recipe.nutrition.macros} />
+          <Badge className="font-mono font-light" variant="outline">{nutrition.calories} <Flame /></Badge>
+          <Macros macros={nutrition.macros} />
         </div>
       </div>
     )
@@ -88,8 +86,8 @@ export function Recipe({ recipe, mealData }: Props) {
         <div className="text-xs shrink-0">{recipe.date}</div>
       </div>
       <div className="flex w-full gap-2 pt-2 justify-between">
-        <Badge className="font-mono font-light" variant="outline">{recipe.nutrition.calories} <Flame /></Badge>
-        <Macros macros={recipe.nutrition.macros} />
+        <Badge className="font-mono font-light" variant="outline">{nutrition.calories} <Flame /></Badge>
+        <Macros macros={nutrition.macros} />
       </div>
     </>
   )

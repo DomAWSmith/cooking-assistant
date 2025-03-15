@@ -3,6 +3,8 @@ import { twMerge } from "tailwind-merge"
 import { startOfToday, endOfToday } from "date-fns"
 import { IMealPlan } from "@/types/IMealPlan"
 import { INutrition } from "@/types/INutrition"
+import { IRecipe } from "@/types/IRecipe"
+import { IIngredient } from "@/types/IIngredient"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -76,7 +78,28 @@ export function getClosestUpcomingMealPlan(mealPlans: IMealPlan[]) {
   return mealPlansAsc[0] || null
 }
 
-export function transformNutritionByServing(nutrition: INutrition, servingCount: number): INutrition {
+export function getRecipeNutritionByServing(recipe: IRecipe, ingredients: IIngredient[], servingCount: number): INutrition {
+  const nutrition = recipe.ingredients.reduce((prev, curr) => {
+    const ingredient = ingredients.find(({ id }) => curr.id === id)
+    if (!ingredient) return prev
+
+    return {
+      calories: prev.calories + ingredient.nutrition.calories,
+      macros: {
+        protein: prev.macros.protein + ingredient.nutrition.macros.protein,
+        fats: prev.macros.fats + ingredient.nutrition.macros.fats,
+        carbs: prev.macros.carbs + ingredient.nutrition.macros.carbs,
+      }
+    }
+  }, {
+    calories: 0,
+    macros: {
+      protein: 0,
+      fats: 0,
+      carbs: 0,
+    }
+  })
+
   const { calories, macros } = nutrition
   const { carbs, fats, protein } = macros
 

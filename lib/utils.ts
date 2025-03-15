@@ -45,8 +45,8 @@ export function getDateFromDateId(dateId: string) {
   const _date = new Date()
   _date.setHours(0, 0, 0, 0)
   _date.setDate(parseInt(date))
-  _date.setDate(parseInt(month))
-  _date.setDate(parseInt(year))
+  _date.setMonth(parseInt(month))
+  _date.setFullYear(parseInt(year))
   
   return _date
 }
@@ -109,3 +109,5 @@ export function getMealPlanTitle(mealPlan: IMealPlan) {
 
   return dateFormatter.formatRange(mealPlan.startDate, mealPlan.endDate)
 }
+
+export const weekDayFormatter = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric" })

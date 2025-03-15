@@ -9,7 +9,7 @@ import {
     DrawerTrigger,
 } from "@/components/ui/drawer"
 
-interface Props {
+export interface Props {
     count: number
     min: number
     max: number
@@ -38,7 +38,7 @@ export default function ServingPicker({ count, min, max, onDecrement, onIncremen
                         <Button
                             size="icon"
                             variant="outline"
-                            className={canDelete ? "text-destructive-foreground" : ""}
+                            className={`text-xl ${canDelete ? "text-destructive-foreground" : ""}`}
                             onClick={onDecrement}
                         >
                             {canDelete ? <Trash2 /> : <Minus />}
@@ -50,7 +50,7 @@ export default function ServingPicker({ count, min, max, onDecrement, onIncremen
                         <Button
                             size="icon"
                             variant="outline"
-                            className={`${count < max ? "" : "opacity-50"} transition-all`}
+                            className={`text-xl ${count < max ? "" : "opacity-50"} transition-all`}
                             onClick={onIncrement}
                         ><Plus /></Button>
                     </div>

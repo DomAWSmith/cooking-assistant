@@ -5,15 +5,16 @@ import { GripVertical } from "lucide-react"
 import { transformNutritionByServing } from "@/lib/utils"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { mealPlanDateMealServingChanged } from "@/app/reducers/mealPlansSlice"
-import ServingPicker from "@/components/serving-picker"
+import { IMealPlanIngredient } from "@/types/IMealPlanIngredient"
 
 interface Props {
     mealPlanId: string
+    dateIngredients: IMealPlanIngredient[]
     dateId: string
     dateMeal: IMealPlanDateMeal
 }
 
-export default function MealPlanOrganiserDragger({ mealPlanId, dateId, dateMeal }: Props) {
+export default function MealPlanOrganiserDragger({ mealPlanId, dateIngredients, dateId, dateMeal }: Props) {
     const dispatch = useAppDispatch()
 
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
@@ -50,39 +51,40 @@ export default function MealPlanOrganiserDragger({ mealPlanId, dateId, dateMeal 
                     <button
                         {...listeners}
                         {...attributes}
-                        className="touch-none transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground pr-2"
+                        className="touch-none transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground pl-4 pr-2"
                     >
-                        <GripVertical className="ml-4 opacity-50" />
+                        <GripVertical className="opacity-50" />
                     </button>
 
                     <div className="flex w-full flex-col items-start gap-2 pl-1 p-4">
                         <Recipe 
-                            expanded={true} 
                             recipe={servingsRecipe} 
+                            mealData={{
+                                dateId,
+                                dateIngredients,
+                                serving: {
+                                    count: servingCount,
+                                    min: minServings,
+                                    max: maxServings,
+                                    onDecrement: () => {
+                                        dispatch(mealPlanDateMealServingChanged({
+                                            mealPlanId,
+                                            dateId,
+                                            mealId: dateMeal.id,
+                                            servingCount: Math.max(servingCount - 1, minServings)
+                                        }))
+                                    },
+                                    onIncrement: () => {
+                                        dispatch(mealPlanDateMealServingChanged({
+                                            mealPlanId,
+                                            dateId,
+                                            mealId: dateMeal.id,
+                                            servingCount: Math.min(servingCount + 1, maxServings)
+                                        }))
+                                    }
+                                }
+                            }}
                         />
-                        <div className="pt-4">
-                            <ServingPicker
-                                count={servingCount}
-                                min={minServings}
-                                max={maxServings}
-                                onDecrement={() => {
-                                    dispatch(mealPlanDateMealServingChanged({
-                                        mealPlanId,
-                                        dateId,
-                                        mealId: dateMeal.id,
-                                        servingCount: Math.max(servingCount - 1, minServings)
-                                    }))
-                                }}
-                                onIncrement={() => {
-                                    dispatch(mealPlanDateMealServingChanged({
-                                        mealPlanId,
-                                        dateId,
-                                        mealId: dateMeal.id,
-                                        servingCount: Math.min(servingCount + 1, maxServings)
-                                    }))
-                                }}
-                            />
-                        </div>
                     </div>
                 </div>
             </div>

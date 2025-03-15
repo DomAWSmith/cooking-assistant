@@ -163,3 +163,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+.lucide {
+  height: 1em;
+  width: 1em;
+}

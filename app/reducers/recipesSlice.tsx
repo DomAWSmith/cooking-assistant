@@ -18,11 +18,13 @@ const initialState: IRecipe[] = [
         "ingredients": [
             {
                 "id": "1",
-                "name": "Ingredient 1"
+                "name": "Ingredient 1",
+                "quantity": 10,
             },
             {
                 "id": "2",
-                "name": "Ingredient 2"
+                "name": "Ingredient 2",
+                "quantity": 1,
             }
         ]
     },
@@ -41,7 +43,8 @@ const initialState: IRecipe[] = [
         "ingredients": [
             {
                 "id": "1",
-                "name": "Ingredient 1"
+                "name": "Ingredient 1",
+                "quantity": 3,
             }
         ]
     }

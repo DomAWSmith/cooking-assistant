@@ -1,10 +1,10 @@
 import { INutrition } from "@/types/INutrition"
-import { IIngredient } from "@/types/IIngredient"
+import { IRecipeIngredient } from "@/types/IRecipeIngredient"
 
 export interface IRecipe {
     id: string
     name: string
     date: string
     nutrition: INutrition
-    ingredients: IIngredient[]
+    ingredients: IRecipeIngredient[]
 }

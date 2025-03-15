@@ -6,7 +6,7 @@ import { useState } from "react"
 import { RecipesPickerDialog } from "./recipes-picker-dialog"
 import { Button } from "./ui/button"
 import { Edit, Flame, Plus } from "lucide-react"
-import { formatNutritionNumber, getAmountOfDaysBetween, getDateId, transformNutritionByServing } from "@/lib/utils"
+import { formatNutritionNumber, getAmountOfDaysBetween, getDateId, transformNutritionByServing, weekDayFormatter } from "@/lib/utils"
 import { Macros } from "./macros"
 import { addDays, isToday } from "date-fns"
 import { IMealPlan } from "@/types/IMealPlan"
@@ -16,6 +16,8 @@ import { IMealPlanDateMeal } from "@/types/IMealPlanDateMeal"
 import { Badge } from "./ui/badge"
 import { INutrition } from "@/types/INutrition"
 import { MealPlanDateNoteDialog } from "@/components/meal-plan-date-note-dialog"
+import { IMealPlanIngredient } from "@/types/IMealPlanIngredient"
+import { IMealPlanDate } from "@/types/IMealPlanDate"
 
 interface Props {
     mealPlan: IMealPlan
@@ -61,10 +63,93 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
         }))
     }
 
-    const prettyDateFormatter = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric" })
+    // TODO - make an editable list and load it here
+    let mealPlanIngredients: IMealPlanIngredient[] = ([
+        {
+            id: "2",
+            name: "Ingredient 2",
+            expiryDate: addDays(startDate, 1).getTime(),
+            quantity: 10
+        }
+    ] as IMealPlanIngredient[])// TODO - remove `as` once we're reading from a source
+        .sort((a, b) => (a.expiryDate || 0) - (b.expiryDate || 0))
+
     const dayCount = getAmountOfDaysBetween(startDate, endDate)
-    let dates: Date[] = []
-    for (let i = 0; i <= dayCount; i++) dates.push(addDays(mealPlan.startDate, i))
+    let mealDates: { 
+        date: Date, 
+        mealDate?: IMealPlanDate,
+        dateIngredients: IMealPlanIngredient[] 
+        nutrition: INutrition
+    }[] = []
+    for (let i = 0; i <= dayCount; i++) {
+        const date = addDays(mealPlan.startDate, i)
+
+        const dateId = getDateId(date)
+        const mealDate = mealPlan.dates.find(date => date.id === dateId)
+        const mealDateMeals = (mealDate?.meals || [])
+
+        let nutrition: INutrition = {
+            calories: 0,
+            macros: {
+                protein: 0,
+                fats: 0,
+                carbs: 0
+            }
+        }
+
+        let dateIngredients: IMealPlanIngredient[] = []
+        mealDateMeals.forEach(({ recipeId, servingCount }) => {
+            const recipe = recipes.find(({ id }) => id === recipeId)
+            if (!recipe) return
+
+            // total up nutrition
+            const mealNutrition = transformNutritionByServing(recipe.nutrition, servingCount)
+            nutrition = {
+                calories: nutrition.calories + mealNutrition.calories,
+                macros: {
+                    protein: nutrition.macros.protein + mealNutrition.macros.protein,
+                    fats: nutrition.macros.fats + mealNutrition.macros.fats,
+                    carbs: nutrition.macros.carbs + mealNutrition.macros.carbs,
+                }
+            }
+
+            // subtract from ingredients for each day and it's meals by serving
+            mealPlanIngredients = mealPlanIngredients.map(mealPlanIngredient => {
+                const _mealPlanIngredient = { ...mealPlanIngredient }
+
+                recipe.ingredients.forEach(recipeIngredient => {
+                    if (mealPlanIngredient.id !== recipeIngredient.id) return
+
+                    const mealPlanIngredientCount = mealPlanIngredient.quantity
+                    const recipeIngredientQtyReq = recipeIngredient.quantity * servingCount
+                    const ingredientQtyUsed = Math.min(mealPlanIngredientCount, recipeIngredientQtyReq)
+                    const mealPlanIngredientQtyLeft = mealPlanIngredientCount - recipeIngredientQtyReq
+                    const recipeIngredientQtyLeft = Math.max(recipeIngredientQtyReq - mealPlanIngredientCount, 0)
+
+                    dateIngredients.push({
+                        id: recipeIngredient.id,
+                        name: mealPlanIngredient.name,
+                        quantity: recipeIngredientQtyLeft > 0 ? -recipeIngredientQtyLeft : ingredientQtyUsed,
+                        expiryDate: mealPlanIngredient.expiryDate
+                    })
+
+                    _mealPlanIngredient.quantity = mealPlanIngredientQtyLeft
+
+                })
+
+                return _mealPlanIngredient
+            })
+
+        })
+        
+        // provide date with it's nutrition and ingredient amounts 
+        mealDates.push({
+            date,
+            mealDate,
+            dateIngredients,
+            nutrition
+        })
+    }
 
     return (
         <>
@@ -106,35 +191,10 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                 onDragEnd={handleDragEnd}
             >
                 <div className="max-w-2xl">
-                    {dates.map(date => {
+                    {mealDates.map(({ date, mealDate, dateIngredients, nutrition }) => {
                         const dateId = getDateId(date)
-                        const mealDate = mealPlan.dates.find(date => date.id === dateId)
                         const dateMeals = mealDate?.meals || []
                         const dateNote = mealDate?.note || ""
-
-                        const nutrition: INutrition = dateMeals
-                            .reduce((prev, curr) => {
-                                const recipe = recipes.find(({ id }) => id === curr.recipeId)
-                                if (!recipe) return prev
-
-                                const mealNutrition = transformNutritionByServing(recipe.nutrition, curr.servingCount)                            
-
-                                return {
-                                    calories: prev.calories + mealNutrition.calories,
-                                    macros: {
-                                        protein: prev.macros.protein + mealNutrition.macros.protein,
-                                        fats: prev.macros.fats + mealNutrition.macros.fats,
-                                        carbs: prev.macros.carbs + mealNutrition.macros.carbs,
-                                    }
-                                }
-                            }, {
-                                calories: 0,
-                                macros: {
-                                    protein: 0,
-                                    fats: 0,
-                                    carbs: 0
-                                }
-                            })
 
                         return (
                             <div key={dateId} className="mb-8">
@@ -142,7 +202,7 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                                     <div className="flex flex-col">
                                         <div className="flex mr-2 gap-2 items-center">
                                             {isToday(date) && <div className="w-2 h-2  mr-1 bg-green-500 rounded-full animate-pulse" />}
-                                            <h2 className="text-lg font-semibold">{prettyDateFormatter.format(date)}</h2>
+                                            <h2 className="text-lg font-semibold">{weekDayFormatter.format(date)}</h2>
                                             <MealPlanDateNoteDialog 
                                                 originalNote={dateNote}
                                                 onSave={(note => {
@@ -170,6 +230,7 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                                         <MealPlanOrganiserDragger 
                                             key={dateMeal.id} 
                                             mealPlanId={mealPlan.id}
+                                            dateIngredients={dateIngredients}
                                             dateId={dateId}
                                             dateMeal={dateMeal} 
                                         />

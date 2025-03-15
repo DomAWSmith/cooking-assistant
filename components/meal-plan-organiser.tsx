@@ -6,7 +6,7 @@ import { useState } from "react"
 import { RecipesPickerDialog } from "./recipes-picker-dialog"
 import { Button } from "./ui/button"
 import { Flame, Plus } from "lucide-react"
-import { formatNutritionNumber, getAmountOfDaysBetween, getDateId, getRecipeNutritionByServing, weekDayFormatter } from "@/lib/utils"
+import { formatNutritionNumber, getDateFromDateId, getDateId, getRecipeNutritionByServing, weekDayFormatter } from "@/lib/utils"
 import { Macros } from "./macros"
 import { addDays, isToday } from "date-fns"
 import { IMealPlan } from "@/types/IMealPlan"
@@ -16,13 +16,15 @@ import { IMealPlanDateMeal } from "@/types/IMealPlanDateMeal"
 import { Badge } from "./ui/badge"
 import { INutrition } from "@/types/INutrition"
 import { MealPlanDateNoteDialog } from "@/components/meal-plan-date-note-dialog"
-import { IMealPlanDate } from "@/types/IMealPlanDate"
 import { IShoppingIngredient } from "@/types/IShoppingIngredient"
-import uniqid from "uniqid"
 
 interface Props {
     mealPlan: IMealPlan
     recipes: IRecipe[]
+}
+
+interface IMealPlanDateWithAvailableIngredients extends IMealPlanDateMeal {
+    availableIngredients: IShoppingIngredient[]
 }
 
 export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
@@ -32,9 +34,6 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
     
     const [lastDateMealId, setLastDateMealId] = useState(0)
     const [selectingDateId, setSelectingDateId] = useState<string | null>(null)
-
-    const startDate = new Date(mealPlan.startDate)
-    const endDate = new Date(mealPlan.endDate)
 
     function handleDragEnd(event: any) {
         const { active, over } = event
@@ -71,26 +70,23 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
         {
             id: "1",
             ingredientId: "2",
-            expiryDate: addDays(startDate, 1).getTime(),
+            expiryDate: addDays(new Date(mealPlan.startDate), 1).getTime(),
             quantity: 10
         }
     ] as IShoppingIngredient[])// TODO - remove `as` once we're reading from a source
         .sort((a, b) => (a.expiryDate || 0) - (b.expiryDate || 0))
 
-    const dayCount = getAmountOfDaysBetween(startDate, endDate)
     let mealDates: { 
         date: Date, 
-        mealDate?: IMealPlanDate,
-        dateIngredients: IShoppingIngredient[] 
+        mealDate?: {
+            id: string
+            meals: IMealPlanDateWithAvailableIngredients[]
+            note?: string
+        },
         nutrition: INutrition
     }[] = []
-    for (let i = 0; i <= dayCount; i++) {
-        const date = addDays(mealPlan.startDate, i)
 
-        const dateId = getDateId(date)
-        const mealDate = mealPlan.dates.find(date => date.id === dateId)
-        const mealDateMeals = (mealDate?.meals || [])
-
+    mealPlan.dates.forEach(mealDate => {
         let nutrition: INutrition = {
             calories: 0,
             macros: {
@@ -100,10 +96,12 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
             }
         }
 
-        let dateIngredients: IShoppingIngredient[] = []
-        mealDateMeals.forEach(({ recipeId, servingCount }) => {
+        let meals: IMealPlanDateWithAvailableIngredients[] = []
+        mealDate.meals.forEach(({ id, recipeId, servingCount }) => {
             const recipe = recipes.find(({ id }) => id === recipeId)
             if (!recipe) return
+
+            let availableIngredients: IShoppingIngredient[] = []
 
             // total up nutrition
             const mealNutrition = getRecipeNutritionByServing(recipe, ingredients, servingCount)
@@ -127,13 +125,12 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                     const recipeIngredientQtyReq = recipeIngredient.quantity * servingCount
                     const ingredientQtyUsed = Math.min(shoppingIngredientCount, recipeIngredientQtyReq)
                     const shoppingIngredientQtyLeft = shoppingIngredientCount - recipeIngredientQtyReq
-                    const recipeIngredientQtyLeft = Math.max(recipeIngredientQtyReq - shoppingIngredientCount, 0)
 
-                    dateIngredients.push({
+                    availableIngredients.push({
                         id: shoppingIngredient.id,
                         ingredientId: recipeIngredient.id,
-                        quantity: recipeIngredientQtyLeft > 0 ? -recipeIngredientQtyLeft : ingredientQtyUsed,
-                        expiryDate: shoppingIngredient.expiryDate
+                        quantity: ingredientQtyUsed,
+                        expiryDate: shoppingIngredient.expiryDate,
                     })
 
                     _shoppingIngredient.quantity = shoppingIngredientQtyLeft
@@ -143,16 +140,25 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                 return _shoppingIngredient
             })
 
+            meals.push({
+                id,
+                recipeId,
+                servingCount,
+                availableIngredients
+            })
         })
-        
+
         // provide date with it's nutrition and ingredient amounts 
         mealDates.push({
-            date,
-            mealDate,
-            dateIngredients,
+            date: getDateFromDateId(mealDate.id),
+            mealDate: {
+                id: mealDate.id,
+                meals,
+                note: mealDate.id,
+            },
             nutrition
         })
-    }
+    })
 
     return (
         <>
@@ -173,9 +179,9 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                         dateMealId++
 
                         meals.push({
-                            id: uniqid(),
+                            id: crypto.randomUUID(),
                             recipeId,
-                            servingCount: 2 // TODO - make default configurable
+                            servingCount: 2, // TODO - make default configurable
                         })
                     })
 
@@ -194,7 +200,7 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                 onDragEnd={handleDragEnd}
             >
                 <div className="max-w-2xl">
-                    {mealDates.map(({ date, mealDate, dateIngredients, nutrition }) => {
+                    {mealDates.map(({ date, mealDate, nutrition }) => {
                         const dateId = getDateId(date)
                         const dateMeals = mealDate?.meals || []
                         const dateNote = mealDate?.note || ""
@@ -233,9 +239,9 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                                         <MealPlanOrganiserDragger 
                                             key={dateMeal.id} 
                                             mealPlanId={mealPlan.id}
-                                            dateIngredients={dateIngredients}
                                             dateId={dateId}
-                                            dateMeal={dateMeal} 
+                                            dateMeal={dateMeal}
+                                            availableIngredients={dateMeal.availableIngredients}
                                         />
                                     ))}
                                 </MealDropperDropper>

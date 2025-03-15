@@ -3,16 +3,16 @@ import { IRecipe } from "@/types/IRecipe"
 import { Badge } from "@/components/ui/badge"
 import { Macros } from "@/components/macros"
 import ServingPicker, { Props as ServingPickerProps } from "@/components/serving-picker"
-import { getDateFromDateId, getRecipeNutritionByServing } from "@/lib/utils"
-import { IShoppingIngredient } from "@/types/IShoppingIngredient"
+import { getDateFromDateId, getRecipeNutritionByServing, weekDayFormatter } from "@/lib/utils"
 import { useAppSelector } from "@/lib/hooks"
+import { IShoppingIngredient } from "@/types/IShoppingIngredient"
 
 interface Props {
   recipe: IRecipe
   mealData?: {
     serving: ServingPickerProps
-    dateIngredients: IShoppingIngredient[]
     dateId: string
+    availableIngredients: IShoppingIngredient[]
   }
 }
 
@@ -21,8 +21,7 @@ export function Recipe({ recipe, mealData }: Props) {
   const nutrition = getRecipeNutritionByServing(recipe, ingredients, mealData?.serving?.count || 1)
 
   if (mealData) {
-    const { serving, dateIngredients, dateId } = mealData
-    const date = getDateFromDateId(dateId)
+    const { serving, availableIngredients } = mealData
 
     let ingredientAlerts: { id: string, name: string, message: string }[] = []
 
@@ -30,26 +29,40 @@ export function Recipe({ recipe, mealData }: Props) {
       const ingredient = ingredients.find(ingredient => ingredient.id === id)
       if (!ingredient) return
 
-      const dateIngredient = dateIngredients.find((dateIngredients => dateIngredients.id === id))
-      if (!dateIngredient) {
+      // TODO - build up duplicate ingredients (of the same id)
+      // e.g. might have two chicken breasts with different expiry dates
+
+      const availableIngredient = availableIngredients.find((availableIngredients => availableIngredients.id === id))
+      if (!availableIngredient) {
         ingredientAlerts.push({
           id: `${id}-required`,
           name: ingredient.name,
           message: "required"
         })
-        return;
+        return
       }
 
-      if (dateIngredient.quantity < quantity) {
+      const recipeQuantity = quantity * serving.count
+
+      if (availableIngredient.quantity < recipeQuantity) {
         ingredientAlerts.push({
           id: `${id}-insufficient`,
           name: ingredient.name,
-          message: `needs ${quantity - dateIngredient.quantity}g more`
+          message: `needs ${Math.min(recipeQuantity - availableIngredient.quantity, recipeQuantity)}g more`
         })
-        return;
+        return
+      }
+
+      const date = getDateFromDateId(mealData.dateId)
+      if (availableIngredient.expiryDate && availableIngredient.expiryDate < date.getTime()) {
+        ingredientAlerts.push({
+          id: `${id}-expiry`,
+          name: ingredient.name,
+          message: `expires on ${weekDayFormatter.format(availableIngredient.expiryDate)}`
+        })
+        return
       }
     })
-
 
     return (
       <div className="flex w-full flex-col gap-2">

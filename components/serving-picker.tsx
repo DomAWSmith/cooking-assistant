@@ -4,6 +4,7 @@ import {
     Drawer,
     DrawerContent,
     DrawerDescription,
+    DrawerFooter,
     DrawerHeader,
     DrawerTitle,
     DrawerTrigger,
@@ -23,7 +24,7 @@ export default function ServingPicker({ count, min, max, onDecrement, onIncremen
     return (
 
         <Drawer>
-            <DrawerTrigger>
+            <DrawerTrigger asChild>
                 <Button variant="secondary" size="sm">
                     {count} {count === 1 ? "serving" : "servings"}
                 </Button>
@@ -33,28 +34,30 @@ export default function ServingPicker({ count, min, max, onDecrement, onIncremen
                     <DrawerTitle>Change serving count</DrawerTitle>
                     <DrawerDescription>To adjust your ingredient and nutrition totals.</DrawerDescription>
                 </DrawerHeader>
-                <div className="w-full mx-auto max-w-xs mb-4">
-                    <div className="w-full py-2 flex items-center gap-2 justify-between ">
-                        <Button
-                            size="icon"
-                            variant="outline"
-                            className={`text-xl ${canDelete ? "text-destructive-foreground" : ""}`}
-                            onClick={onDecrement}
-                        >
-                            {canDelete ? <Trash2 /> : <Minus />}
-                        </Button>
-                        <div className="px-2 text-center">
-                            <div className="text-8xl mb-2 font-bold">{count}</div>
-                            <div className="uppercase text-sm opacity-70 font-bol font-mono">{`${count === 1 ? "serving" : "servings"}`}</div>
+                <DrawerFooter>
+                    <div className="w-full mx-auto max-w-xs mb-4">
+                        <div className="w-full py-2 flex items-center gap-2 justify-between ">
+                            <Button
+                                size="icon"
+                                variant="outline"
+                                className={`text-xl ${canDelete ? "text-destructive-foreground" : ""}`}
+                                onClick={onDecrement}
+                            >
+                                {canDelete ? <Trash2 /> : <Minus />}
+                            </Button>
+                            <div className="px-2 text-center">
+                                <div className="text-8xl mb-2 font-bold">{count}</div>
+                                <div className="uppercase text-sm opacity-70 font-bol font-mono">{`${count === 1 ? "serving" : "servings"}`}</div>
+                            </div>
+                            <Button
+                                size="icon"
+                                variant="outline"
+                                className={`text-xl ${count < max ? "" : "opacity-50"} transition-all`}
+                                onClick={onIncrement}
+                            ><Plus /></Button>
                         </div>
-                        <Button
-                            size="icon"
-                            variant="outline"
-                            className={`text-xl ${count < max ? "" : "opacity-50"} transition-all`}
-                            onClick={onIncrement}
-                        ><Plus /></Button>
                     </div>
-                </div>
+                </DrawerFooter>
             </DrawerContent>
         </Drawer>
     )

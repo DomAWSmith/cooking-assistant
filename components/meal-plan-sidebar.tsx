@@ -36,12 +36,9 @@ export default function MealPlanSidebar({ children, breadcrumbs, showMobileAddNe
         const startDate = nextMonday(yesterday)
 
         dispatch(mealPlanAdded({
-            id: crypto.randomUUID(),
             title: "",
             startDate: startDate.getTime(),
             endDate: addDays(startDate, 6).getTime(),
-            currentIngredientCount: 0,
-            dates: []
         }))
     }
     

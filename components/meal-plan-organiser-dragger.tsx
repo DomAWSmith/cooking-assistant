@@ -9,12 +9,12 @@ import { IShoppingIngredient } from "@/types/IShoppingIngredient"
 
 interface Props {
     mealPlanId: string
-    dateIngredients: IShoppingIngredient[]
     dateId: string
     dateMeal: IMealPlanDateMeal
+    availableIngredients: IShoppingIngredient[]
 }
 
-export default function MealPlanOrganiserDragger({ mealPlanId, dateIngredients, dateId, dateMeal }: Props) {
+export default function MealPlanOrganiserDragger({ mealPlanId, dateId, dateMeal, availableIngredients }: Props) {
     const dispatch = useAppDispatch()
 
     const ingredients = useAppSelector(state => state.ingredients)
@@ -61,7 +61,7 @@ export default function MealPlanOrganiserDragger({ mealPlanId, dateIngredients, 
                             recipe={servingsRecipe} 
                             mealData={{
                                 dateId,
-                                dateIngredients,
+                                availableIngredients,
                                 serving: {
                                     count: servingCount,
                                     min: minServings,

@@ -2,6 +2,8 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { addDays } from "date-fns"
 import { IMealPlan } from "@/types/IMealPlan"
 import { IMealPlanDateMeal } from "@/types/IMealPlanDateMeal"
+import { getAmountOfDaysBetween, getDateId } from "@/lib/utils"
+import { IMealPlanDate } from "@/types/IMealPlanDate"
 
 const lastMonth = addDays(new Date(), -30)
 lastMonth.setHours(0, 0, 0, 0)
@@ -21,36 +23,77 @@ nextMonth.setHours(0, 0, 0, 0)
 // const initialState: IMealPlan[] = []
 const initialState: IMealPlan[] = [
     {
-        "id": "1",
-        "title": "Meal plan 1",
-        "startDate": yesterday.getTime(),
-        "endDate": addDays(yesterday, 2).getTime(),
-        "currentIngredientCount": 0,
-        "dates": []
+        id: '80c06901-d752-433c-9f36-33699dc27320',
+        title: '',
+        startDate: 1742169600000,
+        endDate: 1742688000000,
+        dates: [
+            {
+                id: '17-2-2025',
+                meals: []
+            },
+            {
+                id: '18-2-2025',
+                meals: []
+            },
+            {
+                id: '19-2-2025',
+                meals: []
+            },
+            {
+                id: '20-2-2025',
+                meals: []
+            },
+            {
+                id: '21-2-2025',
+                meals: []
+            },
+            {
+                id: '22-2-2025',
+                meals: []
+            },
+            {
+                id: '23-2-2025',
+                meals: []
+            }
+        ]
     },
     {
-        "id": "2",
-        "title": "Meal plan 2",
-        "startDate": tomorrow.getTime(),
-        "endDate": nextMonth.getTime(),
-        "currentIngredientCount": 0,
-        "dates": []
-    },
-    {
-        "id": "3",
-        "title": "Meal plan 3",
-        "startDate": lastWeek.getTime(),
-        "endDate": yesterday.getTime(),
-        "currentIngredientCount": 0,
-        "dates": []
-    },
-    {
-        "id": "4",
-        "title": "Meal plan 4",
-        "startDate": lastMonth.getTime(),
-        "endDate": lastWeek.getTime(),
-        "currentIngredientCount": 0,
-        "dates": []
+        id: '9e22458e-d5ca-4e84-b0f0-3fe7f6f479b5',
+        title: '',
+        startDate: 1742860800000,
+        endDate: 1743033600000,
+        dates: [
+            {
+                id: '25-2-2025',
+                meals: [
+                    {
+                        id: '1db97244-d780-4c10-b5cb-ed108c38ccd6',
+                        recipeId: '1',
+                        servingCount: 2
+                    },
+                    {
+                        id: '3632d5a2-1f8a-482f-aef8-e6124bf34760',
+                        recipeId: '1',
+                        servingCount: 2
+                    }
+                ]
+            },
+            {
+                id: '26-2-2025',
+                meals: [
+                    {
+                        id: '2991bbdb-afd5-48d5-bb4d-e5c19d1530a4',
+                        recipeId: '1',
+                        servingCount: 2
+                    }
+                ]
+            },
+            {
+                id: '27-2-2025',
+                meals: []
+            }
+        ]
     }
 ] // TODO: use real data
 
@@ -58,8 +101,29 @@ const mealPlansSlice = createSlice({
     name: "mealPlans",
     initialState,
     reducers: {
-        mealPlanAdded: (state, { payload }: PayloadAction<IMealPlan>) => {
-            state.push(payload)
+        mealPlanAdded: (state, { payload }: PayloadAction<Omit<IMealPlan, "id" | "dates">>) => {
+            const { startDate, endDate } = payload
+
+            let dates: IMealPlanDate[] = []
+            const dayCount = getAmountOfDaysBetween(new Date(startDate), new Date(endDate))
+            for (let i = 0; i <= dayCount; i++) {
+                const date = addDays(new Date(startDate), i)
+                const dateId = getDateId(date)
+
+                dates = [...dates, {
+                    id: dateId,
+                    meals: []
+                }]
+            }
+            dates = dates.sort((a, b) => a.id.localeCompare(b.id))
+
+            state.push({
+                ...payload,
+                id: crypto.randomUUID(),
+                startDate,
+                endDate,
+                dates
+            })
         },
         mealPlanRenamed: (state, { payload: { mealPlanId, title } }: PayloadAction<{ mealPlanId: string, title: string }>) => {
             return state.map(mealPlan => mealPlan.id === mealPlanId ? {
@@ -68,47 +132,58 @@ const mealPlansSlice = createSlice({
             } : mealPlan)
         },
         mealPlanDateRangeChanged: (state, { payload: { mealPlanId, startDate, endDate } }: PayloadAction<{ mealPlanId: string, startDate: number, endDate: number }>) => {
-            return state.map(mealPlan => mealPlan.id === mealPlanId ? {
-                ...mealPlan,
-                startDate,
-                endDate,
-            } : mealPlan)
+            return state.map(mealPlan => {
+                if (mealPlan.id !== mealPlanId) return mealPlan
+                
+                let dates: IMealPlanDate[] = []
+                const dayCount = getAmountOfDaysBetween(new Date(startDate), new Date(endDate))
+                for (let i = 0; i <= dayCount; i++) {
+                    const date = addDays(new Date(startDate), i)
+                    const dateId = getDateId(date)
+
+                    const existingMealPlanDate = mealPlan.dates.find(date => date.id === dateId)
+                    if (existingMealPlanDate) {
+                        dates = [...dates, existingMealPlanDate]
+                    } else {
+                        dates = [...dates, {
+                            id: dateId,
+                            meals: []
+                        }]
+                    }
+                }
+                dates = dates.sort((a, b) => a.id.localeCompare(b.id))
+
+                return {
+                    ...mealPlan,
+                    startDate,
+                    endDate,
+                    dates
+                }
+            })
         },
         mealPlanDateMealsChanged: (state, { payload: { mealPlanId, dateId, meals } }: PayloadAction<{ mealPlanId: string, dateId: string, meals: IMealPlanDateMeal[] }>) => {
             return state.map(mealPlan => {
-                const hasDate = mealPlan.dates.find(date => date.id === dateId)
-                if (hasDate) {
-                    return mealPlan.id === mealPlanId ? {
-                        ...mealPlan,
-                        dates: mealPlan.dates.map(date => date.id === dateId ? {
-                            ...date,
-                            meals
-                        } : date)
-                    } : mealPlan
-                } else {
-                    return mealPlan.id === mealPlanId ? {
-                        ...mealPlan,
-                        dates: [...mealPlan.dates, { id: dateId, meals }],
-                    } : mealPlan
+                if (mealPlan.id !== mealPlanId) return mealPlan
+
+                return {
+                    ...mealPlan,
+                    dates: mealPlan.dates.map(date => date.id === dateId ? {
+                        ...date,
+                        meals
+                    } : date)
                 }
             })
         },
         mealPlanDateNoteChanged: (state, { payload: { mealPlanId, dateId, note } }: PayloadAction<{ mealPlanId: string, dateId: string, note: string }>) => {
             return state.map(mealPlan => {
-                const hasDate = mealPlan.dates.find(date => date.id === dateId)
-                if (hasDate) {
-                    return mealPlan.id === mealPlanId ? {
-                        ...mealPlan,
-                        dates: mealPlan.dates.map(date => date.id === dateId ? {
-                            ...date,
-                            note
-                        } : date)
-                    } : mealPlan
-                } else {
-                    return mealPlan.id === mealPlanId ? {
-                        ...mealPlan,
-                        dates: [...mealPlan.dates, { id: dateId, meals: [], note }],
-                    } : mealPlan
+                if (mealPlan.id !== mealPlanId) return mealPlan
+
+                return {
+                    ...mealPlan,
+                    dates: mealPlan.dates.map(date => date.id === dateId ? {
+                        ...date,
+                        note
+                    } : date)
                 }
             })
 

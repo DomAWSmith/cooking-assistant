@@ -5,7 +5,6 @@ export interface IMealPlan {
     title: string
     startDate: number
     endDate: number
-    currentIngredientCount: number
 
     dates: IMealPlanDate[]
 }

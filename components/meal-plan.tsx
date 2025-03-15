@@ -33,6 +33,8 @@ export function MealPlan(mealPlan: IMealPlan) {
     })
   })
 
+  let currentIngredientCount = 0 // TODO - read from meal plan's shopping list
+
   return (
     <Link
       href={href}
@@ -46,7 +48,7 @@ export function MealPlan(mealPlan: IMealPlan) {
       </div>
       <div className="flex w-full gap-2 pt-2">
         <Badge className="font-mono font-light" variant="outline">{mealCount} <CookingPot /></Badge>
-        <Badge className="font-mono font-light" variant="outline">{mealPlan.currentIngredientCount}/{totalIngredientCount} <ListTodo /></Badge>
+        <Badge className="font-mono font-light" variant="outline">{currentIngredientCount}/{totalIngredientCount} <ListTodo /></Badge>
       </div>
     </Link>
   )

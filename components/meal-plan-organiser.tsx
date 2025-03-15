@@ -18,6 +18,7 @@ import { INutrition } from "@/types/INutrition"
 import { MealPlanDateNoteDialog } from "@/components/meal-plan-date-note-dialog"
 import { IMealPlanDate } from "@/types/IMealPlanDate"
 import { IShoppingIngredient } from "@/types/IShoppingIngredient"
+import uniqid from "uniqid"
 
 interface Props {
     mealPlan: IMealPlan
@@ -172,7 +173,7 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                         dateMealId++
 
                         meals.push({
-                            id: dateMealId.toString(),
+                            id: uniqid(),
                             recipeId,
                             servingCount: 2 // TODO - make default configurable
                         })

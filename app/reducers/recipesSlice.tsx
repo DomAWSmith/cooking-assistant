@@ -8,10 +8,10 @@ const initialState: IRecipe[] = [
         "name": "Recipe 1",
         "date": "Yesterday",
         "ingredients": [
-            {
-                "id": "1",
-                "quantity": 2,
-            },
+            // {
+            //     "id": "1",
+            //     "quantity": 2,
+            // },
             {
                 "id": "2",
                 "quantity": 1,
@@ -23,10 +23,10 @@ const initialState: IRecipe[] = [
         "name": "Recipe 2",
         "date": "A week ago",
         "ingredients": [
-            {
-                "id": "1",
-                "quantity": 2,
-            }
+            // {
+            //     "id": "1",
+            //     "quantity": 2,
+            // }
         ]
     }
 ] // TODO: use real data

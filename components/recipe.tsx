@@ -32,7 +32,7 @@ export function Recipe({ recipe, mealData }: Props) {
       // TODO - build up duplicate ingredients (of the same id)
       // e.g. might have two chicken breasts with different expiry dates
 
-      const availableIngredient = availableIngredients.find((availableIngredients => availableIngredients.id === id))
+      const availableIngredient = availableIngredients.find((availableIngredient => availableIngredient.ingredientId === id))
       if (!availableIngredient) {
         ingredientAlerts.push({
           id: `${id}-required`,

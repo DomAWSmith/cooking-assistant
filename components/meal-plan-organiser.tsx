@@ -72,6 +72,12 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
             ingredientId: "2",
             expiryDate: addDays(new Date(mealPlan.startDate), 1).getTime(),
             quantity: 10
+        },
+        {
+            id: "1b",
+            ingredientId: "2",
+            expiryDate: addDays(new Date(mealPlan.startDate), 1).getTime(),
+            quantity: 10
         }
     ] as IShoppingIngredient[])// TODO - remove `as` once we're reading from a source
         .sort((a, b) => (a.expiryDate || 0) - (b.expiryDate || 0))
@@ -119,7 +125,7 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                 const _shoppingIngredient = { ...shoppingIngredient }
 
                 recipe.ingredients.forEach(recipeIngredient => {
-                    if (shoppingIngredient.id !== recipeIngredient.id) return
+                    if (shoppingIngredient.ingredientId !== recipeIngredient.id) return
 
                     const shoppingIngredientCount = shoppingIngredient.quantity
                     const recipeIngredientQtyReq = recipeIngredient.quantity * servingCount

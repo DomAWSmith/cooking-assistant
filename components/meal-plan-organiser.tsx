@@ -11,7 +11,7 @@ import { Macros } from "./macros"
 import { addDays, isToday } from "date-fns"
 import { IMealPlan } from "@/types/IMealPlan"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
-import { mealPlanDateMealsChanged, mealPlanDateNoteChanged } from "@/app/reducers/mealPlansSlice"
+import { mealPlanDateMealsAdded, mealPlanDateMealsMoved, mealPlanDateNoteChanged } from "@/app/reducers/mealPlansSlice"
 import { IMealPlanDateMeal } from "@/types/IMealPlanDateMeal"
 import { Badge } from "./ui/badge"
 import { INutrition } from "@/types/INutrition"
@@ -32,7 +32,6 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
 
     const ingredients = useAppSelector(state => state.ingredients)
     
-    const [lastDateMealId, setLastDateMealId] = useState(0)
     const [selectingDateId, setSelectingDateId] = useState<string | null>(null)
 
     function handleDragEnd(event: any) {
@@ -50,18 +49,11 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
         if (!oldMealPlanDate || !dateMeal) return
         if (oldMealPlanDate.id === newMealPlanDate.id) return
 
-        // Remove date meal from old date
-        dispatch(mealPlanDateMealsChanged({
+        dispatch(mealPlanDateMealsMoved({
             mealPlanId: mealPlan.id,
-            dateId: oldMealPlanDate.id,
-            meals: oldMealPlanDate?.meals.filter(({ id }) => id !== dateMealId)
-        }))
-
-        // Add date meal to new date
-        dispatch(mealPlanDateMealsChanged({
-            mealPlanId: mealPlan.id,
-            dateId: newMealPlanDate.id,
-            meals: [...newMealPlanDate.meals, dateMeal]
+            oldDateId: oldMealPlanDate.id,
+            newDateId: newMealPlanDate.id,
+            meal: dateMeal
         }))
     }
     
@@ -177,26 +169,14 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                 onSave={(recipeIds) => {
                     if (selectingDateId === null) return
 
-                    let dateMealId = lastDateMealId
-
-                    let meals: IMealPlanDateMeal[] = []
-                    recipeIds.forEach(recipeId => {
-                        dateMealId++
-
-                        meals.push({
+                    dispatch(mealPlanDateMealsAdded({ 
+                        mealPlanId: mealPlan.id, 
+                        dateId: selectingDateId, 
+                        meals: recipeIds.map(recipeId => ({
                             id: generateId(),
                             recipeId,
                             servingCount: 2, // TODO - make default configurable
-                        })
-                    })
-
-                    setLastDateMealId(dateMealId)
-
-                    const dateMeals = mealPlan.dates.find(date => date.id === selectingDateId)?.meals || []
-                    dispatch(mealPlanDateMealsChanged({ 
-                        mealPlanId: mealPlan.id, 
-                        dateId: selectingDateId, 
-                        meals: [...dateMeals, ...meals]
+                        }))
                     }))
                 }}
             />

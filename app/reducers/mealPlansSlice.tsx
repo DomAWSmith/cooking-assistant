@@ -166,8 +166,9 @@ const mealPlansSlice = createSlice({
                 }
             })
         },
-        mealPlanDateMealsChanged: (state, { payload: { mealPlanId, dateId, meals } }: PayloadAction<{ mealPlanId: string, dateId: string, meals: IMealPlanDateMeal[] }>) => {
-            // TODO - consider shopping items that are marked has checked, that may now have incorrect quantities
+        mealPlanDateMealsAdded: (state, { payload: { mealPlanId, dateId, meals } }: PayloadAction<{ mealPlanId: string, dateId: string, meals: IMealPlanDateMeal[] }>) => {
+            // TODO - add to shopping list, each item should have association with a mealPlanDateMealId
+
             return state.map(mealPlan => {
                 if (mealPlan.id !== mealPlanId) return mealPlan
 
@@ -175,8 +176,34 @@ const mealPlansSlice = createSlice({
                     ...mealPlan,
                     dates: mealPlan.dates.map(date => date.id === dateId ? {
                         ...date,
-                        meals
+                        meals: [...date.meals, ...meals]
                     } : date)
+                }
+            })
+        },
+        mealPlanDateMealsMoved: (state, { payload: { mealPlanId, oldDateId, newDateId, meal } }: PayloadAction<{ mealPlanId: string, oldDateId: string, newDateId: string, meal: IMealPlanDateMeal }>) => {
+            // TODO - consider shopping items that are marked has checked, that may now have incorrect quantities
+
+            return state.map(mealPlan => {
+                if (mealPlan.id !== mealPlanId) return mealPlan
+
+                return {
+                    ...mealPlan,
+                    dates: mealPlan.dates.map(date => {
+                        if (date.id === oldDateId) {
+                            return {
+                                ...date,
+                                meals: date.meals.filter(({ id }) => id !== meal.id)
+                            }
+                        } else if (date.id === newDateId) {
+                            return {
+                                ...date,
+                                meals: [...date.meals, meal]
+                            }
+                        }
+
+                        return date
+                    })
                 }
             })
         },
@@ -264,7 +291,8 @@ export const {
     mealPlanAdded, 
     mealPlanRenamed, 
     mealPlanDateRangeChanged, 
-    mealPlanDateMealsChanged, 
+    mealPlanDateMealsAdded,
+    mealPlanDateMealsMoved,
     mealPlanDateNoteChanged, 
     mealPlanDateMealServingChanged, 
     mealPlanShoppingListItemAdded, 

@@ -99,9 +99,9 @@ export function MealPlanShoppingList({ mealPlan }: Props) {
                                             const isChecked = true // TODO - action checking
             
                                             return (
-                                                <li key={id} className="flex items-center gap-2">
-                                                    <Checkbox checked={isChecked} className="mt-0.5" />
-                                                    <div className="overflow-hidden text-ellipsis">{name}</div>
+                                                <li key={id} className="flex items-start gap-2">
+                                                    <Checkbox checked={isChecked} className="mt-2.5" />
+                                                    <div className="mt-1">{name}</div>
                                                     <div className="ml-auto flex items-center gap-4">
                                                         <div className={`${isChecked ? "" : "opacity-0 pointer-events-none"}`}>
                                                             <DatePicker

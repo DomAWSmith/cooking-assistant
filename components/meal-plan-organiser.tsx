@@ -78,6 +78,12 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
             ingredientId: "2",
             expiryDate: addDays(new Date(mealPlan.startDate), 1).getTime(),
             quantity: 10
+        },
+        {
+            id: "1c",
+            ingredientId: "2",
+            expiryDate: addDays(new Date(mealPlan.startDate), 1).getTime(),
+            quantity: 10
         }
     ] as IShoppingIngredient[])// TODO - remove `as` once we're reading from a source
         .sort((a, b) => (a.expiryDate || 0) - (b.expiryDate || 0))
@@ -121,16 +127,24 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
             }
 
             // subtract from ingredients for each day and it's meals by serving
-            shoppingIngredients = shoppingIngredients.map(shoppingIngredient => {
-                const _shoppingIngredient = { ...shoppingIngredient }
-
-                recipe.ingredients.forEach(recipeIngredient => {
+            recipe.ingredients.forEach(recipeIngredient => {
+                shoppingIngredients.forEach((shoppingIngredient, shoppingIngredientIndex) => {
                     if (shoppingIngredient.ingredientId !== recipeIngredient.id) return
 
+                    const recipeIngredientQtyAlreadyUsed = availableIngredients
+                        .reduce((prev, curr) => {
+                            if (curr.ingredientId !== recipeIngredient.id) return prev
+                            return Math.max(prev + curr.quantity, 0)
+                        }, 0)
+
                     const shoppingIngredientCount = shoppingIngredient.quantity
-                    const recipeIngredientQtyReq = recipeIngredient.quantity * servingCount
+                    if (!shoppingIngredientCount) return
+
+                    const recipeIngredientQtyReq = (recipeIngredient.quantity * servingCount) - recipeIngredientQtyAlreadyUsed
                     const ingredientQtyUsed = Math.min(shoppingIngredientCount, recipeIngredientQtyReq)
-                    const shoppingIngredientQtyLeft = shoppingIngredientCount - recipeIngredientQtyReq
+                    const shoppingIngredientQtyLeft = Math.max(shoppingIngredientCount - recipeIngredientQtyReq, 0)
+
+                    if (recipeIngredientQtyReq === 0) return
 
                     availableIngredients.push({
                         id: shoppingIngredient.id,
@@ -139,11 +153,8 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                         expiryDate: shoppingIngredient.expiryDate,
                     })
 
-                    _shoppingIngredient.quantity = shoppingIngredientQtyLeft
-
+                    shoppingIngredients[shoppingIngredientIndex].quantity = shoppingIngredientQtyLeft
                 })
-
-                return _shoppingIngredient
             })
 
             meals.push({

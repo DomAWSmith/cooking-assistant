@@ -29,9 +29,6 @@ export function Recipe({ recipe, mealData }: Props) {
       const ingredient = ingredients.find(ingredient => ingredient.id === id)
       if (!ingredient) return
 
-      // TODO - build up duplicate ingredients (of the same id)
-      // e.g. might have two chicken breasts with different expiry dates
-
       const availableIngredient = availableIngredients.find((availableIngredient => availableIngredient.ingredientId === id))
       if (!availableIngredient) {
         ingredientAlerts.push({
@@ -42,26 +39,34 @@ export function Recipe({ recipe, mealData }: Props) {
         return
       }
 
-      const recipeQuantity = quantity * serving.count
+      const availableIngredientQuantity = availableIngredients
+        .reduce((prev, curr) => {
+          if (curr.ingredientId !== id) return prev
 
-      if (availableIngredient.quantity < recipeQuantity) {
+          return prev + curr.quantity
+        }, 0)
+      const recipeQuantity = quantity * serving.count
+      if (availableIngredientQuantity < recipeQuantity) {
         ingredientAlerts.push({
           id: `${id}-insufficient`,
           name: ingredient.name,
-          message: `needs ${Math.min(recipeQuantity - availableIngredient.quantity, recipeQuantity)}g more`
+          message: `needs ${Math.min(recipeQuantity - availableIngredientQuantity, recipeQuantity)}g more`
         })
         return
       }
 
       const date = getDateFromDateId(mealData.dateId)
-      if (availableIngredient.expiryDate && availableIngredient.expiryDate < date.getTime()) {
+      availableIngredients.forEach(availableIngredient => {
+        if (!availableIngredient.expiryDate) return
+        if (!availableIngredient.quantity) return
+        if (availableIngredient.expiryDate >= date.getTime()) return
+
         ingredientAlerts.push({
           id: `${id}-expiry`,
           name: ingredient.name,
           message: `expires on ${weekDayFormatter.format(availableIngredient.expiryDate)}`
         })
-        return
-      }
+      })
     })
 
     return (

@@ -100,7 +100,7 @@ export function MealPlanShoppingList({ mealPlan }: Props) {
             
                                             return (
                                                 <li key={id} className="flex items-center gap-2">
-                                                    <Checkbox checked={isChecked} className="mt-1" />
+                                                    <Checkbox checked={isChecked} className="mt-0.5" />
                                                     <div className="overflow-hidden text-ellipsis">{name}</div>
                                                     <div className="ml-auto flex items-center gap-4">
                                                         <div className={`${isChecked ? "" : "opacity-0 pointer-events-none"}`}>

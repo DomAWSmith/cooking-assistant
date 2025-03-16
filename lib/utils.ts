@@ -139,3 +139,27 @@ export function getMealPlanTitle(mealPlan: IMealPlan) {
 }
 
 export const weekDayFormatter = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric" })
+
+export function getMealPlanCounts(mealPlan: IMealPlan, recipes: IRecipe[]) {
+  let mealCount = 0
+  let totalIngredientCount = 0
+  mealPlan.dates.forEach(date => {
+    mealCount += date.meals.length
+
+    date.meals.forEach(meal => {
+      const recipe = recipes.find(({ id }) => id === meal.recipeId)
+      if (!recipe) return
+
+      totalIngredientCount += recipe.ingredients.length
+    })
+  })
+
+  const currentIngredientCount = mealPlan.shoppingIngredients
+    .reduce((prev, curr) => prev + (curr.quantity > 0 ? 1 : 0), 0)
+
+  return {
+    mealCount,
+    currentIngredientCount,
+    totalIngredientCount
+  }
+}

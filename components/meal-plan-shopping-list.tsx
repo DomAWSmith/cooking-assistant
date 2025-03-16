@@ -20,6 +20,7 @@ import { mealPlanShoppingListItemAdded, mealPlanShoppingListItemRemoved, mealPla
 
 interface Props {
     mealPlan: IMealPlan
+    label: string
 }
 
 interface IShoppingIngredientGroup {
@@ -31,7 +32,7 @@ interface IShoppingIngredientRequired extends IShoppingIngredient {
     ingredient: IIngredient
 }
 
-export function MealPlanShoppingList({ mealPlan }: Props) {
+export function MealPlanShoppingList({ mealPlan, label }: Props) {
     const dispatch = useAppDispatch()
 
     const recipes = useAppSelector(state => state.recipes)
@@ -76,7 +77,7 @@ export function MealPlanShoppingList({ mealPlan }: Props) {
             <DialogTrigger asChild>
                 <Button className="w-full bg-amber-400 text-black hover:bg-amber-500">
                     <ShoppingBasket />
-                    <span>Shopping list</span>
+                    <span>{label}</span>
                 </Button>
             </DialogTrigger>
             <DialogContent className="overflow-y-scroll max-h-[90vh]">
@@ -101,7 +102,12 @@ export function MealPlanShoppingList({ mealPlan }: Props) {
                                             
                                             const shoppingIngredient = mealPlan.shoppingIngredients.find(shoppingIngredient => shoppingIngredient.id === id)
                                             
-                                            const isChecked = shoppingIngredient ? shoppingIngredient.quantity >= quantity : false
+                                            let isChecked = false
+                                            let quantityChanged = false
+                                            if (shoppingIngredient) {
+                                                isChecked = shoppingIngredient.quantity >= 0
+                                                quantityChanged = shoppingIngredient.quantity !== quantity // meal plan could change after checking an ingredient, so we'll indicate with a faded checkbox
+                                            }
 
                                             return (
                                                 <li key={id} className="flex items-start gap-2">
@@ -121,7 +127,7 @@ export function MealPlanShoppingList({ mealPlan }: Props) {
                                                                 }))
                                                             }
                                                         }}
-                                                        className="mt-2.5"
+                                                        className={`mt-2.5 ${quantityChanged ? "opacity-25" : ""}`}
                                                     />
                                                     <label htmlFor={id} className="mt-1.5 grow">{name}</label>
                                                     <div className="ml-auto flex items-center gap-4">
@@ -129,7 +135,6 @@ export function MealPlanShoppingList({ mealPlan }: Props) {
                                                             <DatePicker
                                                                 originalDate={shoppingIngredient?.expiryDate ? new Date(shoppingIngredient.expiryDate) : undefined}
                                                                 onSave={date => {
-                                                                    console.log("onSave", { date })
                                                                     dispatch(mealPlanShoppingListItemExpiryDateSet({
                                                                         mealPlanId: mealPlan.id,
                                                                         shoppingListItemId: groupIngredient.id,

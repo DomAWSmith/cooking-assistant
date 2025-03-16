@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { CookingPot, ListTodo } from "lucide-react"
 import { usePathname } from "next/navigation"
-import { getMealPlanTitle } from "@/lib/utils"
+import { getMealPlanCounts, getMealPlanTitle } from "@/lib/utils"
 import { useAppSelector } from "@/lib/hooks"
 
 export function MealPlan(mealPlan: IMealPlan) {
@@ -20,20 +20,7 @@ export function MealPlan(mealPlan: IMealPlan) {
 
   const href = `/meal-plans/${mealPlan.id}`
 
-  let mealCount = 0
-  let totalIngredientCount = 0
-  mealPlan.dates.forEach(date => {
-    mealCount += date.meals.length
-
-    date.meals.forEach(meal => {
-      const recipe = recipes.find(({ id }) => id === meal.recipeId)
-      if (!recipe) return
-
-      totalIngredientCount += recipe.ingredients.length
-    })
-  })
-
-  let currentIngredientCount = 0 // TODO - read from meal plan's shopping list
+  const { mealCount, currentIngredientCount, totalIngredientCount } = getMealPlanCounts(mealPlan, recipes)
 
   return (
     <Link

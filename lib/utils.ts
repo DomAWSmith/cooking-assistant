@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { startOfToday, endOfToday } from "date-fns"
+import uniqid from "uniqid"
 import { IMealPlan } from "@/types/IMealPlan"
 import { INutrition } from "@/types/INutrition"
 import { IRecipe } from "@/types/IRecipe"
@@ -11,7 +12,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function generateId() {
-  return crypto.randomUUID()
+  return uniqid()
 }
 
 /**

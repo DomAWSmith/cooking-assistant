@@ -40,6 +40,10 @@ export function MealPlanShoppingList({ mealPlan, label }: Props) {
 
     const ingredientGroups: IShoppingIngredientGroup[] = []
 
+    // TODO - use unique IDs
+    // build from mealplan.shoppingIngredients and then populate other required ingredients that don't exist with empty keys
+    // this should resolve ingredients getting messed up when moving meal plan meals around
+
     const ingredientsRequired: IShoppingIngredientRequired[] = []
     mealPlan.dates.forEach(date => {
         date.meals.forEach(meal => {

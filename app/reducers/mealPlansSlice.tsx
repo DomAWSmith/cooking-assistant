@@ -136,6 +136,7 @@ const mealPlansSlice = createSlice({
             } : mealPlan)
         },
         mealPlanDateRangeChanged: (state, { payload: { mealPlanId, startDate, endDate } }: PayloadAction<{ mealPlanId: string, startDate: number, endDate: number }>) => {
+            // TODO - update shoppingIngredients            
             return state.map(mealPlan => {
                 if (mealPlan.id !== mealPlanId) return mealPlan
                 
@@ -166,6 +167,9 @@ const mealPlansSlice = createSlice({
             })
         },
         mealPlanDateMealsChanged: (state, { payload: { mealPlanId, dateId, meals } }: PayloadAction<{ mealPlanId: string, dateId: string, meals: IMealPlanDateMeal[] }>) => {
+            // TODO - update shoppingIngredients, note: we don't want to remove ingredient if we're just moving a meal
+            // perhaps we add a new dispatch which is "mealPlanDateMealMoved"
+
             return state.map(mealPlan => {
                 if (mealPlan.id !== mealPlanId) return mealPlan
 

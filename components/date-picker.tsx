@@ -15,9 +15,10 @@ interface Props {
     originalDate?: Date
     onSave: (date?: Date) => void
     label?: string
+    dateDisplayFormat?: string
 }
 
-export function DatePicker({ originalDate, onSave, label = "Pick a date" }: Props) {
+export function DatePicker({ originalDate, onSave, label = "Pick a date", dateDisplayFormat = "LLL dd, y" }: Props) {
     const [date, setDate] = useState<Date | undefined>(originalDate)
     const [isOpen, setIsOpen] = useState(false)
 
@@ -40,7 +41,7 @@ export function DatePicker({ originalDate, onSave, label = "Pick a date" }: Prop
                     >
                         <CalendarIcon />
                         {date ? (
-                            format(date, "LLL dd, y")
+                            format(date, dateDisplayFormat)
                         ) : (
                             <span>{label}</span>
                         )}

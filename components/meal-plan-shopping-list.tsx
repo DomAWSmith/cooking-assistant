@@ -146,6 +146,7 @@ export function MealPlanShoppingList({ mealPlan, label }: Props) {
                                                                     }))
                                                                 }}
                                                                 label="Set expiry"
+                                                                dateDisplayFormat="LLL dd"
                                                             />
                                                         </div>
                                                         <div>{quantity}g</div>

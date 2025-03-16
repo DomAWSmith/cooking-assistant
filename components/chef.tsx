@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import ChefFace from "@/components/chef-face"
 import { IMealPlan } from "@/types/IMealPlan"
-import { getAmountOfDaysBetween, isActiveMealPlan, relativeDate } from "@/lib/utils"
+import { getAmountOfDaysBetween, getMealPlanTitle, isActiveMealPlan, relativeDate } from "@/lib/utils"
 import { startOfToday } from "date-fns"
 import { CookingPot, NotebookPen } from "lucide-react"
 
@@ -36,6 +36,7 @@ export default function Chef({ hasRecipes, nextMealPlan }: Props) {
         actionLabel = "Create your first recipe"
         actionMessage = `Once you've created some recipes, you'll be able to plan meals`
     } else if (nextMealPlan !== null) {
+        const title = `meal plan <strong>${getMealPlanTitle(nextMealPlan)}</strong>`
         actionIcon = <CookingPot />
         actionLink = `/meal-plans/${nextMealPlan.id}`
         actionLabel = "View meal plan"
@@ -45,15 +46,15 @@ export default function Chef({ hasRecipes, nextMealPlan }: Props) {
             const daysLeft = getAmountOfDaysBetween(startOfToday(), new Date(nextMealPlan.endDate))
 
             if (daysTotal === daysLeft) {
-                actionMessage = `You have <strong>${nextMealPlan.title}</strong> starting today for ${daysLeft} days`
+                actionMessage = `You have ${title} starting today for ${daysLeft} days`
             } else if (daysLeft) {
-                actionMessage = `Today is your last day of <strong>${nextMealPlan.title}</strong>`
+                actionMessage = `Today is your last day of ${title}`
             } else {
-                actionMessage = `You have ${daysLeft} of ${daysTotal} days left of <strong>${nextMealPlan.title}</strong>`
+                actionMessage = `You have ${daysLeft} of ${daysTotal} days left of ${title}`
             }
 
         } else {
-            actionMessage = `You have <strong>${nextMealPlan.title}</strong> ${relativeDate(now, new Date(nextMealPlan.startDate))}`
+            actionMessage = `You have ${title} ${relativeDate(now, new Date(nextMealPlan.startDate))}`
         }
     } else {
         actionIcon = <CookingPot />

@@ -6,7 +6,6 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { useParams } from "next/navigation"
 import DialogRename from "@/components/dialog-rename"
 import { DatePickerWithRange } from "@/components/date-picker-with-range"
-import { addDays } from "date-fns"
 import { mealPlanDateRangeChanged, mealPlanRenamed } from "@/app/reducers/mealPlansSlice"
 import MealPlanOrganiser from "@/components/meal-plan-organiser"
 import { MealPlanShoppingList } from "@/components/meal-plan-shopping-list"
@@ -21,18 +20,6 @@ export default function Page() {
   const recipes = useAppSelector(state => state.recipes)
 
   const pageName = mealPlan === undefined ? "Not Found" : getMealPlanTitle(mealPlan)
-
-  const tomorrow = addDays(new Date(), 1)
-  tomorrow.setHours(0, 0, 0, 0)
-  const nextWeek = addDays(new Date(), 7)
-  nextWeek.setHours(0, 0, 0, 0)
-
-  let startDate = tomorrow
-  let endDate = nextWeek
-  if (mealPlan) {
-    startDate = new Date(mealPlan.startDate)
-    endDate = new Date(mealPlan.endDate)
-  }
 
   return (
     <MealPlanSidebar
@@ -55,33 +42,35 @@ export default function Page() {
         </>
       }
     >
-      <div className="flex flex-wrap justify-between gap-4 p-4">
-        <div className="flex-1 md:flex-0">
-          <MealPlanShoppingList />
-        </div>
-        <div className="flex-1 md:flex-0">
-          <DatePickerWithRange
-            fromDate={startDate}
-            toDate={endDate}
-            onSave={(startDate, endDate) => {
-              dispatch(mealPlanDateRangeChanged({
-                mealPlanId: id,
-                startDate: startDate.getTime(),
-                endDate: endDate.getTime()
-              }))
-            }}
-          />
-        </div>
-      </div>
+     {mealPlan && (
+        <>
+          <div className="flex flex-wrap justify-between gap-4 p-4">
+            <div className="flex-1 md:flex-0">
+              <MealPlanShoppingList mealPlan={mealPlan} />
+            </div>
+            <div className="flex-1 md:flex-0">
+              <DatePickerWithRange
+                fromDate={new Date(mealPlan.startDate)}
+                toDate={new Date(mealPlan.endDate)}
+                onSave={(startDate, endDate) => {
+                  dispatch(mealPlanDateRangeChanged({
+                    mealPlanId: id,
+                    startDate: startDate.getTime(),
+                    endDate: endDate.getTime()
+                  }))
+                }}
+              />
+            </div>
+          </div>
 
-      {mealPlan && (
-        <div className="p-4">
-          <MealPlanOrganiser 
-            mealPlan={mealPlan}
-            recipes={recipes} 
-          />
-        </div>
-      )}
+          <div className="p-4">
+            <MealPlanOrganiser
+              mealPlan={mealPlan}
+              recipes={recipes}
+            />
+          </div>
+        </>
+     )}
     </MealPlanSidebar>
   )
 }

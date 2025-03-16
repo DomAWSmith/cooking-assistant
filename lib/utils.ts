@@ -10,6 +10,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export function generateId() {
+  return crypto.randomUUID()
+}
+
 /**
  * Get a relative date message
  * @param d1 First date

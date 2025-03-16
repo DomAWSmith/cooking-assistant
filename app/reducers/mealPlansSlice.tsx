@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { addDays } from "date-fns"
 import { IMealPlan } from "@/types/IMealPlan"
 import { IMealPlanDateMeal } from "@/types/IMealPlanDateMeal"
-import { getAmountOfDaysBetween, getDateId } from "@/lib/utils"
+import { generateId, getAmountOfDaysBetween, getDateId } from "@/lib/utils"
 import { IMealPlanDate } from "@/types/IMealPlanDate"
 
 const lastMonth = addDays(new Date(), -30)
@@ -56,7 +56,8 @@ const initialState: IMealPlan[] = [
                 id: '23-2-2025',
                 meals: []
             }
-        ]
+        ],
+        shoppingIngredients: []
     },
     {
         id: '9e22458e-d5ca-4e84-b0f0-3fe7f6f479b5',
@@ -93,7 +94,8 @@ const initialState: IMealPlan[] = [
                 id: '27-2-2025',
                 meals: []
             }
-        ]
+        ],
+        shoppingIngredients: []
     }
 ] // TODO: use real data
 
@@ -101,7 +103,7 @@ const mealPlansSlice = createSlice({
     name: "mealPlans",
     initialState,
     reducers: {
-        mealPlanAdded: (state, { payload }: PayloadAction<Omit<IMealPlan, "id" | "dates">>) => {
+        mealPlanAdded: (state, { payload }: PayloadAction<Omit<IMealPlan, "id" | "dates" | "shoppingIngredients">>) => {
             const { startDate, endDate } = payload
 
             let dates: IMealPlanDate[] = []
@@ -119,10 +121,11 @@ const mealPlansSlice = createSlice({
 
             state.push({
                 ...payload,
-                id: crypto.randomUUID(),
+                id: generateId(),
                 startDate,
                 endDate,
-                dates
+                dates,
+                shoppingIngredients: []
             })
         },
         mealPlanRenamed: (state, { payload: { mealPlanId, title } }: PayloadAction<{ mealPlanId: string, title: string }>) => {

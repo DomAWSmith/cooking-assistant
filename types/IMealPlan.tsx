@@ -1,4 +1,5 @@
 import { IMealPlanDate } from "@/types/IMealPlanDate"
+import { IShoppingIngredient } from "@/types/IShoppingIngredient"
 
 export interface IMealPlan {
     id: string
@@ -7,4 +8,6 @@ export interface IMealPlan {
     endDate: number
 
     dates: IMealPlanDate[]
+
+    shoppingIngredients: IShoppingIngredient[]
 }

@@ -4,7 +4,7 @@ import { IIngredient } from "@/types/IIngredient"
 const initialState: IIngredient[] = [
     {
         "id": "1",
-        "name": "Ingredient 1",
+        "name": "Greek yoghurt",
         "nutrition": {
             "calories": 10,
             "macros": {
@@ -12,11 +12,12 @@ const initialState: IIngredient[] = [
                 "fats": 10,
                 "protein": 10,
             }
-        }
+        },
+        "type": "Dairy"
     },
     {
         "id": "2",
-        "name": "Ingredient 2",
+        "name": "Mincemeat",
         "nutrition": {
             "calories": 1,
             "macros": {
@@ -24,7 +25,8 @@ const initialState: IIngredient[] = [
                 "fats": 1,
                 "protein": 1,
             }
-        }
+        },
+        "type": "Meat"
     }
 ] // TODO: use real data
 

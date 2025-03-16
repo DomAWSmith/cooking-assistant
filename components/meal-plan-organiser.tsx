@@ -6,7 +6,7 @@ import { useState } from "react"
 import { RecipesPickerDialog } from "./recipes-picker-dialog"
 import { Button } from "./ui/button"
 import { Flame, Plus } from "lucide-react"
-import { formatNutritionNumber, getDateFromDateId, getDateId, getRecipeNutritionByServing, weekDayFormatter } from "@/lib/utils"
+import { formatNutritionNumber, generateId, getDateFromDateId, getDateId, getRecipeNutritionByServing, weekDayFormatter } from "@/lib/utils"
 import { Macros } from "./macros"
 import { addDays, isToday } from "date-fns"
 import { IMealPlan } from "@/types/IMealPlan"
@@ -64,28 +64,8 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
             meals: [...newMealPlanDate.meals, dateMeal]
         }))
     }
-
-    // TODO - make an editable list and load it here
-    let shoppingIngredients: IShoppingIngredient[] = ([
-        {
-            id: "1",
-            ingredientId: "2",
-            expiryDate: addDays(new Date(mealPlan.startDate), 1).getTime(),
-            quantity: 10
-        },
-        {
-            id: "1b",
-            ingredientId: "2",
-            expiryDate: addDays(new Date(mealPlan.startDate), 1).getTime(),
-            quantity: 10
-        },
-        {
-            id: "1c",
-            ingredientId: "2",
-            expiryDate: addDays(new Date(mealPlan.startDate), 1).getTime(),
-            quantity: 10
-        }
-    ] as IShoppingIngredient[])// TODO - remove `as` once we're reading from a source
+    
+    const shoppingIngredients = [...mealPlan.shoppingIngredients]
         .sort((a, b) => (a.expiryDate || 0) - (b.expiryDate || 0))
 
     let mealDates: { 
@@ -196,7 +176,7 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                         dateMealId++
 
                         meals.push({
-                            id: crypto.randomUUID(),
+                            id: generateId(),
                             recipeId,
                             servingCount: 2, // TODO - make default configurable
                         })

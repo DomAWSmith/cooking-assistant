@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { format } from "date-fns"
 import { Calendar as CalendarIcon, Eraser } from "lucide-react"
 
@@ -13,22 +13,22 @@ import {
 
 interface Props {
     originalDate?: Date
-    onSave: (date: Date) => void
+    onSave: (date?: Date) => void
+    label?: string
 }
 
-export function DatePicker({ originalDate, onSave }: Props) {
+export function DatePicker({ originalDate, onSave, label = "Pick a date" }: Props) {
     const [date, setDate] = useState<Date | undefined>(originalDate)
     const [isOpen, setIsOpen] = useState(false)
 
+    useEffect(() => {
+        if (!isOpen) onSave(date)
+
+    }, [isOpen])
+
     return (
         <div className={cn("grid gap-2")}>
-            <Popover open={isOpen} onOpenChange={(isOpen) => {
-                setIsOpen(isOpen)
-                if (isOpen) return
-                if (!date) return
-
-                onSave(date)
-            }}>
+            <Popover open={isOpen} onOpenChange={setIsOpen}>
                 <PopoverTrigger asChild>
                     <Button
                         id="date"
@@ -42,7 +42,7 @@ export function DatePicker({ originalDate, onSave }: Props) {
                         {date ? (
                             format(date, "LLL dd, y")
                         ) : (
-                            <span>Pick a date</span>
+                            <span>{label}</span>
                         )}
                     </Button>
                 </PopoverTrigger>

@@ -10,13 +10,13 @@ import {
 } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { IMealPlan } from "@/types/IMealPlan"
-import { useAppSelector } from "@/lib/hooks"
+import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { IShoppingIngredient } from "@/types/IShoppingIngredient"
-import { generateId } from "@/lib/utils"
 import { IIngredient } from "@/types/IIngredient"
 import { Checkbox } from "@/components/ui/checkbox"
 import { IIngredientType } from "@/types/IIngredientType"
 import { DatePicker } from "@/components/date-picker"
+import { mealPlanShoppingListItemAdded, mealPlanShoppingListItemRemoved, mealPlanShoppingListItemExpiryDateSet } from "@/app/reducers/mealPlansSlice"
 
 interface Props {
     mealPlan: IMealPlan
@@ -32,6 +32,8 @@ interface IShoppingIngredientRequired extends IShoppingIngredient {
 }
 
 export function MealPlanShoppingList({ mealPlan }: Props) {
+    const dispatch = useAppDispatch()
+
     const recipes = useAppSelector(state => state.recipes)
     const ingredients = useAppSelector(state => state.ingredients)
 
@@ -48,7 +50,7 @@ export function MealPlanShoppingList({ mealPlan }: Props) {
                 if (!ingredient) return
 
                 const ingredientRequired = {
-                    id: generateId(),
+                    id: `${date.id}-${meal.id}-${recipeIngredient.id}`,
                     ingredientId: ingredient.id,
                     quantity: recipeIngredient.quantity * meal.servingCount,
                     ingredient
@@ -94,19 +96,46 @@ export function MealPlanShoppingList({ mealPlan }: Props) {
                                     <div className="font-bold mb-2">{group.type}</div>
                                     <ul className="flex flex-col gap-2 px-3">
                                         {group.ingredients.map(groupIngredient => {
-                                            const { id, ingredient, quantity, expiryDate } = groupIngredient
+                                            const { id, ingredient, quantity } = groupIngredient
                                             const { name } = ingredient
-                                            const isChecked = true // TODO - action checking
-            
+                                            
+                                            const shoppingIngredient = mealPlan.shoppingIngredients.find(shoppingIngredient => shoppingIngredient.id === id)
+                                            
+                                            const isChecked = shoppingIngredient ? shoppingIngredient.quantity >= quantity : false
+
                                             return (
                                                 <li key={id} className="flex items-start gap-2">
-                                                    <Checkbox checked={isChecked} className="mt-2.5" />
+                                                    <Checkbox 
+                                                        className="mt-2.5" 
+                                                        checked={isChecked} 
+                                                        onClick={() => {
+                                                            if (isChecked) {
+                                                                dispatch(mealPlanShoppingListItemRemoved({
+                                                                    mealPlanId: mealPlan.id,
+                                                                    shoppingListItemId: groupIngredient.id
+                                                                }))
+                                                            } else {
+                                                                dispatch(mealPlanShoppingListItemAdded({
+                                                                    mealPlanId: mealPlan.id,
+                                                                    shoppingIngredient: groupIngredient
+                                                                }))
+                                                            }
+                                                        }}
+                                                    />
                                                     <div className="mt-1">{name}</div>
                                                     <div className="ml-auto flex items-center gap-4">
                                                         <div className={`${isChecked ? "" : "opacity-0 pointer-events-none"}`}>
                                                             <DatePicker
-                                                                originalDate={expiryDate ? new Date(expiryDate) : undefined}
-                                                                onSave={() => { }}
+                                                                originalDate={shoppingIngredient?.expiryDate ? new Date(shoppingIngredient.expiryDate) : undefined}
+                                                                onSave={date => {
+                                                                    console.log("onSave", { date })
+                                                                    dispatch(mealPlanShoppingListItemExpiryDateSet({
+                                                                        mealPlanId: mealPlan.id,
+                                                                        shoppingListItemId: groupIngredient.id,
+                                                                        expiryDate: date ? date.getTime() : undefined
+                                                                    }))
+                                                                }}
+                                                                label="Set expiry"
                                                             />
                                                         </div>
                                                         <div>{quantity}g</div>

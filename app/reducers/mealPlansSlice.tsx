@@ -4,6 +4,7 @@ import { IMealPlan } from "@/types/IMealPlan"
 import { IMealPlanDateMeal } from "@/types/IMealPlanDateMeal"
 import { generateId, getAmountOfDaysBetween, getDateId } from "@/lib/utils"
 import { IMealPlanDate } from "@/types/IMealPlanDate"
+import { IShoppingIngredient } from "@/types/IShoppingIngredient"
 
 const lastMonth = addDays(new Date(), -30)
 lastMonth.setHours(0, 0, 0, 0)
@@ -213,8 +214,56 @@ const mealPlansSlice = createSlice({
                 } : date),
             } : mealPlan)
         },
+        mealPlanShoppingListItemAdded: (state, { payload: { mealPlanId, shoppingIngredient } }: PayloadAction<{ mealPlanId: string, shoppingIngredient: IShoppingIngredient }>) => {
+            return state.map(mealPlan => {
+                if (mealPlan.id !== mealPlanId) return mealPlan
+
+                return {
+                    ...mealPlan,
+                    shoppingIngredients: [...mealPlan.shoppingIngredients, shoppingIngredient]
+                }
+            })
+        },
+        mealPlanShoppingListItemRemoved: (state, { payload: { mealPlanId, shoppingListItemId } }: PayloadAction<{ mealPlanId: string, shoppingListItemId: string }>) => {
+            return state.map(mealPlan => {
+                if (mealPlan.id !== mealPlanId) return mealPlan
+
+                return {
+                    ...mealPlan,
+                    shoppingIngredients: mealPlan.shoppingIngredients.filter(shoppingIngredient => shoppingIngredient.id !== shoppingListItemId)
+                }
+            })
+        },
+        mealPlanShoppingListItemExpiryDateSet: (state, { payload: { mealPlanId, shoppingListItemId, expiryDate } }: PayloadAction<{ mealPlanId: string, shoppingListItemId: string, expiryDate?: number }>) => {
+            return state.map(mealPlan => {
+                if (mealPlan.id !== mealPlanId) return mealPlan
+
+                return {
+                    ...mealPlan,
+                    shoppingIngredients: mealPlan.shoppingIngredients.map(shoppingIngredient => {
+                        if (shoppingIngredient.id !== shoppingListItemId) return shoppingIngredient
+
+                        return {
+                            ...shoppingIngredient,
+                            expiryDate,
+                        }
+
+                    })
+                }
+            })
+        }
     }
 })
 
-export const { mealPlanAdded, mealPlanRenamed, mealPlanDateRangeChanged, mealPlanDateMealsChanged, mealPlanDateNoteChanged, mealPlanDateMealServingChanged } = mealPlansSlice.actions
+export const { 
+    mealPlanAdded, 
+    mealPlanRenamed, 
+    mealPlanDateRangeChanged, 
+    mealPlanDateMealsChanged, 
+    mealPlanDateNoteChanged, 
+    mealPlanDateMealServingChanged, 
+    mealPlanShoppingListItemAdded, 
+    mealPlanShoppingListItemRemoved, 
+    mealPlanShoppingListItemExpiryDateSet 
+} = mealPlansSlice.actions
 export default mealPlansSlice.reducer

@@ -65,7 +65,7 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
         }))
     }
     
-    const shoppingIngredients = [...mealPlan.shoppingIngredients]
+    let shoppingIngredients = [...mealPlan.shoppingIngredients]
         .sort((a, b) => (a.expiryDate || 0) - (b.expiryDate || 0))
 
     let mealDates: { 
@@ -108,7 +108,8 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
 
             // subtract from ingredients for each day and it's meals by serving
             recipe.ingredients.forEach(recipeIngredient => {
-                shoppingIngredients.forEach((shoppingIngredient, shoppingIngredientIndex) => {
+                shoppingIngredients.forEach(shoppingIngredient => {
+                    const shoppingIngredientId = shoppingIngredient.id
                     if (shoppingIngredient.ingredientId !== recipeIngredient.id) return
 
                     const recipeIngredientQtyAlreadyUsed = availableIngredients
@@ -127,13 +128,20 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                     if (recipeIngredientQtyReq === 0) return
 
                     availableIngredients.push({
-                        id: shoppingIngredient.id,
+                        id: shoppingIngredientId,
                         ingredientId: recipeIngredient.id,
                         quantity: ingredientQtyUsed,
                         expiryDate: shoppingIngredient.expiryDate,
                     })
 
-                    shoppingIngredients[shoppingIngredientIndex].quantity = shoppingIngredientQtyLeft
+                    shoppingIngredients = shoppingIngredients.map(shoppingIngredient => {
+                        if (shoppingIngredient.id !== shoppingIngredientId) return shoppingIngredient
+
+                        return {
+                            ...shoppingIngredient,
+                            quantity: shoppingIngredientQtyLeft
+                        }
+                    })
                 })
             })
 

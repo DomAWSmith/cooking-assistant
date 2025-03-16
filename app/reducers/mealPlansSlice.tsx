@@ -167,9 +167,7 @@ const mealPlansSlice = createSlice({
             })
         },
         mealPlanDateMealsChanged: (state, { payload: { mealPlanId, dateId, meals } }: PayloadAction<{ mealPlanId: string, dateId: string, meals: IMealPlanDateMeal[] }>) => {
-            // TODO - update shoppingIngredients, note: we don't want to remove ingredient if we're just moving a meal
-            // perhaps we add a new dispatch which is "mealPlanDateMealMoved"
-
+            // TODO - consider shopping items that are marked has checked, that may now have incorrect quantities
             return state.map(mealPlan => {
                 if (mealPlan.id !== mealPlanId) return mealPlan
 
@@ -197,6 +195,9 @@ const mealPlansSlice = createSlice({
 
         },
         mealPlanDateMealServingChanged: (state, { payload: { mealPlanId, dateId, mealId, servingCount } }: PayloadAction<{ mealPlanId: string, dateId: string, mealId: string, servingCount: number }>) => {
+            // TODO - when a meal is removed
+            // remove any ingredients that are no longer needed (consider other meals might need the ones this meal was using)
+
             if (servingCount <= 0) {
                 return state.map(mealPlan => mealPlan.id === mealPlanId ? {
                     ...mealPlan,

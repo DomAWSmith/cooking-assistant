@@ -159,7 +159,7 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
             mealDate: {
                 id: mealDate.id,
                 meals,
-                note: mealDate.id,
+                note: mealDate.note,
             },
             nutrition
         })

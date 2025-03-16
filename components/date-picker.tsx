@@ -22,7 +22,7 @@ export function DatePicker({ originalDate, onSave, label = "Pick a date" }: Prop
     const [isOpen, setIsOpen] = useState(false)
 
     useEffect(() => {
-        if (!isOpen) onSave(date)
+        if (!isOpen && originalDate !== date) onSave(date)
 
     }, [isOpen])
 

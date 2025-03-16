@@ -106,7 +106,7 @@ export function MealPlanShoppingList({ mealPlan }: Props) {
                                             return (
                                                 <li key={id} className="flex items-start gap-2">
                                                     <Checkbox 
-                                                        className="mt-2.5" 
+                                                        id={id}
                                                         checked={isChecked} 
                                                         onClick={() => {
                                                             if (isChecked) {
@@ -121,8 +121,9 @@ export function MealPlanShoppingList({ mealPlan }: Props) {
                                                                 }))
                                                             }
                                                         }}
+                                                        className="mt-2.5"
                                                     />
-                                                    <div className="mt-1">{name}</div>
+                                                    <label htmlFor={id} className="mt-1.5 grow">{name}</label>
                                                     <div className="ml-auto flex items-center gap-4">
                                                         <div className={`${isChecked ? "" : "opacity-0 pointer-events-none"}`}>
                                                             <DatePicker

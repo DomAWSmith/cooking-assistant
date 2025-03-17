@@ -9,7 +9,7 @@ import { DatePickerWithRange } from "@/components/date-picker-with-range"
 import { mealPlanDateRangeChanged, mealPlanRenamed } from "@/app/reducers/mealPlansSlice"
 import MealPlanOrganiser from "@/components/meal-plan-organiser"
 import { MealPlanShoppingList } from "@/components/meal-plan-shopping-list"
-import { getMealPlanCounts, getMealPlanTitle } from "@/lib/utils"
+import { getDateFromDateId, getIngredientsFromMealServingCountChange, getMealPlanCounts, getMealPlanTitle } from "@/lib/utils"
 
 export default function Page() {
   const { id } = useParams<{ id: string }>()
@@ -39,10 +39,35 @@ export default function Page() {
               fromDate={new Date(mealPlan.startDate)}
               toDate={new Date(mealPlan.endDate)}
               onSave={(startDate, endDate) => {
+                // delete any dates that are out of range along with
+                // - meals within each date
+                // - shopping ingredients for those meals
+                const mealDatesToRemove = mealPlan.dates
+                  .filter(mealDate => {
+                    const date = getDateFromDateId(mealDate.id).getTime()
+
+                    if (date < startDate.getTime() || date > endDate.getTime()) return true
+                    return false
+                  })
+
+                let newShoppingIngredients = [...mealPlan.shoppingIngredients]
+                mealDatesToRemove.forEach(mealDate => {
+                  mealDate.meals.forEach(dateMeal => {
+                    newShoppingIngredients = getIngredientsFromMealServingCountChange(
+                      mealPlan,
+                      mealDate.id,
+                      dateMeal,
+                      recipes,
+                      0 // setting serving count to 0 deletes the meal
+                    )
+                  })
+                })
+
                 dispatch(mealPlanDateRangeChanged({
                   mealPlanId: id,
                   startDate: startDate.getTime(),
-                  endDate: endDate.getTime()
+                  endDate: endDate.getTime(),
+                  shoppingIngredients: newShoppingIngredients
                 }))
               }}
             />

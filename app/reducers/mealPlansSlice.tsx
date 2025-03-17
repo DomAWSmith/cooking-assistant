@@ -57,9 +57,7 @@ const mealPlansSlice = createSlice({
                 title,
             } : mealPlan)
         },
-        mealPlanDateRangeChanged: (state, { payload: { mealPlanId, startDate, endDate } }: PayloadAction<{ mealPlanId: string, startDate: number, endDate: number }>) => {
-            // TODO - move meals from dates outside of range to last new date inside range
-
+        mealPlanDateRangeChanged: (state, { payload: { mealPlanId, startDate, endDate, shoppingIngredients } }: PayloadAction<{ mealPlanId: string, startDate: number, endDate: number, shoppingIngredients: IShoppingIngredient[] }>) => {
             return state.map(mealPlan => {
                 if (mealPlan.id !== mealPlanId) return mealPlan
                 
@@ -85,7 +83,8 @@ const mealPlansSlice = createSlice({
                     ...mealPlan,
                     startDate,
                     endDate,
-                    dates
+                    dates,
+                    shoppingIngredients
                 }
             })
         },

@@ -3,7 +3,7 @@ import { IMealPlanDateMeal } from "@/types/IMealPlanDateMeal"
 import { buttonVariants } from "@/components/ui/button"
 import { Recipe } from "@/components/recipe"
 import { GripVertical } from "lucide-react"
-import { getRecipeNutritionByServing } from "@/lib/utils"
+import { getIngredientsFromMealServingCountChange, getRecipeNutritionByServing } from "@/lib/utils"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { mealPlanDateMealServingChanged } from "@/app/reducers/mealPlansSlice"
 import { IShoppingIngredient } from "@/types/IShoppingIngredient"
@@ -42,52 +42,18 @@ export default function MealPlanOrganiserDragger({ mealPlan, dateId, dateMeal, a
     const maxServings = 100
 
     const changeServingCount = (newServingCount: number) => {
-        // adjust unchecked items first 
-        // so items that have been checked are less likely to become "invalidated"
-        // e.g. user ticked that they have 10g of something which now needs to be 20g)
-        let newShoppingIngredients = [...mealPlan.shoppingIngredients]
-            .sort((a, b) => (a.isChecked === b.isChecked) ? 0 : a.isChecked ? 1 : -1)
-
-        mealPlan.dates.forEach(date => {
-            if (date.id !== dateId) return
-
-            date.meals.forEach(({ id, recipeId }) => {
-                if (id !== dateMeal.id) return
-                
-                const recipe = recipes.find(recipe => recipe.id === recipeId)
-                if (!recipe) return []
-
-                const oldServingCount = dateMeal.servingCount
-
-                // update shopping ingredients 
-                // by finding matching ingredients and changing their old quantity requirements to the new quantity requirements
-                recipe.ingredients
-                    .map(({ id: ingredientId, quantity }) => {
-                        let recipeIngredientUpdated = false
-
-                        newShoppingIngredients = newShoppingIngredients
-                            .map(ingredient => {
-                                if (ingredient.ingredientId !== ingredientId) return ingredient
-                                if (ingredient.quantity !== quantity * oldServingCount) return ingredient
-                                if (recipeIngredientUpdated) return ingredient
-
-                                recipeIngredientUpdated = true
-                                return {
-                                    ...ingredient,
-                                    quantity: quantity * newServingCount
-                                }
-                            })
-                            .filter(ingredient => ingredient.quantity > 0)
-                    })
-            })
-        })
-
         dispatch(mealPlanDateMealServingChanged({
             mealPlanId: mealPlan.id,
             dateId,
             mealId: dateMeal.id,
             servingCount: newServingCount,
-            shoppingIngredients: newShoppingIngredients
+            shoppingIngredients: getIngredientsFromMealServingCountChange(
+                mealPlan,
+                dateId,
+                dateMeal,
+                recipes,
+                newServingCount
+            )
         }))
     }
 

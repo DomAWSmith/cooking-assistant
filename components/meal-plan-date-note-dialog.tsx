@@ -1,4 +1,4 @@
-import { Edit } from "lucide-react"
+import { Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -40,8 +40,8 @@ export function MealPlanDateNoteDialog({ originalNote = "", onSave } : Props) {
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button variant="ghost">
-                    <Edit />
+                <Button variant="ghost" className="text-xs">
+                    <Pencil />
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] overflow-y-scroll max-h-[90vh]">

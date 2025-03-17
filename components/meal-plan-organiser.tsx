@@ -209,8 +209,8 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                             <div key={dateId} className="mb-8">
                                 <div className="mb-2 flex flex-col justify-between lg:flex-row lg:items-end">
                                     <div className="flex flex-col">
-                                        <div className="flex mr-2 gap-2 items-center">
-                                            {isToday(date) && <div className="w-2 h-2  mr-1 bg-green-500 rounded-full animate-pulse" />}
+                                        <div className="flex mr-2 gap-1 items-center">
+                                            {isToday(date) && <div className="w-2 h-2 mr-1 bg-green-500 rounded-full animate-pulse" />}
                                             <h2 className="text-lg font-semibold">{weekDayFormatter.format(date)}</h2>
                                             <MealPlanDateNoteDialog 
                                                 originalNote={dateNote}
@@ -234,7 +234,7 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                                         </div>
                                     )}
                                 </div>
-                                <MealDropperDropper id={dateId} isPopulated={dateMeals.length > 0}>
+                                <MealDropperDropper id={dateId}>
                                     {dateMeals.map(dateMeal => (
                                         <MealPlanOrganiserDragger 
                                             key={dateMeal.id} 
@@ -244,16 +244,14 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                                             availableIngredients={dateMeal.availableIngredients}
                                         />
                                     ))}
-                                </MealDropperDropper>
-                                <div className="w-full border border-t-0 rounded-b">
                                     <Button
                                         onClick={() => setSelectingDateId(dateId)}
                                         variant="ghost"
-                                        className="w-full rounded-t-none rounded-b"
+                                        className="w-full min-h-16 rounded-b rounded-t-none"
                                     >
                                         <Plus />
                                     </Button>
-                                </div>
+                                </MealDropperDropper>
                             </div>
                         )
                     })}

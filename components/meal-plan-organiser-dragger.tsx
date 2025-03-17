@@ -1,5 +1,6 @@
 import { useDraggable } from "@dnd-kit/core"
 import { IMealPlanDateMeal } from "@/types/IMealPlanDateMeal"
+import { buttonVariants } from "@/components/ui/button"
 import { Recipe } from "@/components/recipe"
 import { GripVertical } from "lucide-react"
 import { getRecipeNutritionByServing } from "@/lib/utils"
@@ -51,9 +52,9 @@ export default function MealPlanOrganiserDragger({ mealPlanId, dateId, dateMeal,
                     <button
                         {...listeners}
                         {...attributes}
-                        className="touch-none transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground pl-4 pr-2"
+                        className={`${buttonVariants({ variant: "ghost", className: "h-auto rounded-none touch-none transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" })} `}
                     >
-                        <GripVertical className="opacity-50" />
+                        <GripVertical className="opacity-50 ml-4 mr-2" />
                     </button>
 
                     <div className="flex w-full flex-col items-start gap-2 pl-1 p-4">

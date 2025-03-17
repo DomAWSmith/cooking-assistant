@@ -57,13 +57,20 @@ export function Recipe({ recipe, mealData }: Props) {
       }
 
       if (availableIngredient.expiryDate) {
-        if (availableIngredient.expiryDate >= date.getTime()) return
-
-        ingredientAlerts.push({
-          id: `${id}-expiry`,
-          name: ingredient.name,
-          message: `expires on ${weekDayFormatter.format(availableIngredient.expiryDate)}`
-        })
+        if (availableIngredient.expiryDate === date.getTime()) {
+          ingredientAlerts.push({
+            id: `${id}-expiry`,
+            name: ingredient.name,
+            message: `close to expiry`
+          })
+        } else if (availableIngredient.expiryDate < date.getTime()) {
+          ingredientAlerts.push({
+            id: `${id}-expired`,
+            name: ingredient.name,
+            message: `expires on ${weekDayFormatter.format(availableIngredient.expiryDate)}`
+          })
+        }
+        return
       }
     })
 

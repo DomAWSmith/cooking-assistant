@@ -116,7 +116,8 @@ export function MealPlanShoppingList({ mealPlan, label }: Props) {
                                                     />
                                                     <label htmlFor={id} className="mt-1.5 grow">{name}</label>
                                                     <div className="ml-auto flex items-center gap-4">
-                                                        <div className={`${checkedState !== CheckedState.UNCHECKED ? "" : "opacity-0 pointer-events-none"}`}>
+                                                        <div className="font-mono">{quantity}g</div>
+                                                        <div>
                                                             <DatePicker
                                                                 originalDate={expiryDate ? new Date(expiryDate) : undefined}
                                                                 onSave={date => {
@@ -128,11 +129,11 @@ export function MealPlanShoppingList({ mealPlan, label }: Props) {
                                                                         }
                                                                     }))
                                                                 }}
-                                                                label="Set expiry"
-                                                                dateDisplayFormat="LLL dd"
+                                                                label={""}
+                                                                dateDisplayFormat={""}
+                                                                isDisabled={checkedState === CheckedState.UNCHECKED}
                                                             />
                                                         </div>
-                                                        <div className="font-mono">{quantity}g</div>
                                                     </div>
                                                 </li>
                                             )

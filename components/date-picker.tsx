@@ -16,9 +16,10 @@ interface Props {
     onSave: (date?: Date) => void
     label?: string
     dateDisplayFormat?: string
+    isDisabled?: boolean
 }
 
-export function DatePicker({ originalDate, onSave, label = "Pick a date", dateDisplayFormat = "LLL dd, y" }: Props) {
+export function DatePicker({ originalDate, onSave, label = "Pick a date", dateDisplayFormat = "LLL dd, y", isDisabled = false }: Props) {
     const [date, setDate] = useState<Date | undefined>(originalDate)
     const [isOpen, setIsOpen] = useState(false)
 
@@ -28,7 +29,7 @@ export function DatePicker({ originalDate, onSave, label = "Pick a date", dateDi
     }, [isOpen])
 
     return (
-        <div className={cn("grid gap-2")}>
+        <div className={`${cn("grid gap-2")} transition-opacity duration-200 ${isDisabled ? "opacity-0 pointer-events-none" : ""}`}>
             <Popover open={isOpen} onOpenChange={setIsOpen}>
                 <PopoverTrigger asChild>
                     <Button
@@ -36,14 +37,19 @@ export function DatePicker({ originalDate, onSave, label = "Pick a date", dateDi
                         variant={"outline"}
                         className={cn(
                             "w-full justify-center font-normal",
-                            !date && "text-muted-foreground"
+                            !date && "text-muted-foreground opacity-75"
                         )}
+                        tabIndex={isDisabled ? -1 : 0}
                     >
                         <CalendarIcon />
                         {date ? (
-                            format(date, dateDisplayFormat)
+                            <>
+                                {dateDisplayFormat && format(date, dateDisplayFormat)}
+                            </>
                         ) : (
-                            <span>{label}</span>
+                            <>
+                                {label && <span>{label}</span>}
+                            </>
                         )}
                     </Button>
                 </PopoverTrigger>

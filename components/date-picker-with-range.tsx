@@ -24,6 +24,8 @@ export function DatePickerWithRange({ fromDate, toDate, onSave }: Props) {
         to: toDate,
     })
 
+    const dateFormatter = new Intl.DateTimeFormat("en-GB", { dateStyle: "medium" })
+
     return (
         <div className={cn("grid gap-2")}>
             <Popover onOpenChange={(isOpen) => {
@@ -44,12 +46,9 @@ export function DatePickerWithRange({ fromDate, toDate, onSave }: Props) {
                         <CalendarIcon />
                         {date?.from ? (
                             date.to ? (
-                                <>
-                                    {format(date.from, "LLL dd, y")} -{" "}
-                                    {format(date.to, "LLL dd, y")}
-                                </>
+                                dateFormatter.formatRange(date.from, date.to)
                             ) : (
-                                format(date.from, "LLL dd, y")
+                                dateFormatter.format(date.from)
                             )
                         ) : (
                             <span>Pick a date</span>

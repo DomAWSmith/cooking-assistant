@@ -71,7 +71,7 @@ export function MealPlanShoppingList({ mealPlan, label }: Props) {
                 <DialogHeader>
                     <DialogTitle>Shopping list</DialogTitle>
                     <DialogDescription>
-                        By filling out ingredient expiry dates, we can help use them in time
+                        Entering expiry dates will ensure you use ingredients in time
                     </DialogDescription>
                 </DialogHeader>
 

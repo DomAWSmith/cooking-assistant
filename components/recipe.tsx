@@ -1,4 +1,5 @@
-import { CircleAlert, Flame } from "lucide-react"
+import { useState } from "react"
+import { Apple, ChevronLeft, CircleAlert, Flame } from "lucide-react"
 import { IRecipe } from "@/types/IRecipe"
 import { Badge } from "@/components/ui/badge"
 import { Macros } from "@/components/macros"
@@ -6,6 +7,8 @@ import ServingPicker, { Props as ServingPickerProps } from "@/components/serving
 import { getDateFromDateId, getRecipeNutritionByServing, weekDayFormatter } from "@/lib/utils"
 import { useAppSelector } from "@/lib/hooks"
 import { IShoppingIngredient } from "@/types/IShoppingIngredient"
+import { Button } from "@/components/ui/button"
+import { Tooltip } from "@/components/tooltip"
 
 interface Props {
   recipe: IRecipe
@@ -19,6 +22,8 @@ interface Props {
 export function Recipe({ recipe, mealData }: Props) {
   const ingredients = useAppSelector(state => state.ingredients)
   const nutrition = getRecipeNutritionByServing(recipe, ingredients, mealData?.serving?.count || 1)
+
+  const [hasDetailsActive, setHasDetailsActive] = useState(false)
 
   if (mealData) {
     const { serving, availableIngredients, dateId } = mealData
@@ -95,8 +100,19 @@ export function Recipe({ recipe, mealData }: Props) {
           </div>
         )}
         <div className="flex gap-2 justify-end">
-          <Badge className="font-mono font-light" variant="outline">{nutrition.calories} <Flame /></Badge>
-          <Macros macros={nutrition.macros} />
+          <div className={`pr-4 pb-[1px] flex gap-2 items-end ${hasDetailsActive ? "" : "hidden"}`}>
+            <Badge className="font-mono font-light" variant="outline">{nutrition.calories} <Flame /></Badge>
+            <Macros macros={nutrition.macros} />
+          </div>
+          <Tooltip message={hasDetailsActive ? "Hide nutrition info" : "Show nutrition info"}>
+              <Button
+                onClick={() => setHasDetailsActive(!hasDetailsActive)}
+                variant="outline"
+              >
+                <ChevronLeft className={hasDetailsActive ? "-scale-x-100" : ""} />
+                <Apple />
+              </Button>
+          </Tooltip>
         </div>
       </div>
     )

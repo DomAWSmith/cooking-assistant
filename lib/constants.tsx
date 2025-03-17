@@ -1,0 +1,1 @@
+export const MEAL_PLAN_LOCALSTORAGE_KEY = "mealPlans"

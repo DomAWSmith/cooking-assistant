@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { addDays } from "date-fns"
 import { IMealPlan } from "@/types/IMealPlan"
 import { IMealPlanDateMeal } from "@/types/IMealPlanDateMeal"
-import { generateId, getAmountOfDaysBetween, getDateId } from "@/lib/utils"
+import { getAmountOfDaysBetween, getDateId } from "@/lib/utils"
 import { IMealPlanDate } from "@/types/IMealPlanDate"
 import { IShoppingIngredient } from "@/types/IShoppingIngredient"
 

@@ -1,7 +1,9 @@
+import { CheckedState } from "@/types/enums/CheckedState"
+
 export interface IShoppingIngredient {
     id: string
     ingredientId: string
-    isChecked: boolean
+    checkedState: CheckedState
     expiryDate?: number
     quantity: number
 }

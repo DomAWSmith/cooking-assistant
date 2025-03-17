@@ -8,6 +8,7 @@ import { IRecipe } from "@/types/IRecipe"
 import { IIngredient } from "@/types/IIngredient"
 import { IMealPlanDateMeal } from "@/types/IMealPlanDateMeal"
 import { IShoppingIngredient } from "@/types/IShoppingIngredient"
+import { CheckedState } from "@/types/enums/CheckedState"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -157,7 +158,7 @@ export function getMealPlanCounts(mealPlan: IMealPlan, recipes: IRecipe[]) {
   })
 
   const currentIngredientCount = mealPlan.shoppingIngredients
-    .filter(({ isChecked }) => isChecked)
+    .filter(({ checkedState }) => checkedState === CheckedState.CHECKED)
     .length
 
   return {
@@ -177,7 +178,7 @@ export function generateShoppingIngredientsForMeals(meals: IMealPlanDateMeal[], 
         .map(({ id: ingredientId, quantity }) => ({
           id: generateId(),
           ingredientId,
-          isChecked: false,
+          checkedState: CheckedState.UNCHECKED,
           quantity: quantity * servingCount
         }))
       
@@ -198,7 +199,10 @@ export function getIngredientsFromMealServingCountChange(mealPlan: IMealPlan, da
   // try to adjust unchecked items first so items that have been checked are less likely to become "invalidated"
   // e.g. user ticked that they have 10g of something which now needs to be 20g)
   let newShoppingIngredients = [...mealPlan.shoppingIngredients]
-    .sort((a, b) => (a.isChecked === b.isChecked) ? 0 : a.isChecked ? 1 : -1)
+    .sort((a, b) => {
+      if (a.checkedState === b.checkedState) return 0
+      return a.checkedState - b.checkedState // unchecked, then invalidated, then checked
+    })
 
   mealPlan.dates.forEach(date => {
     if (date.id !== dateId) return
@@ -224,7 +228,8 @@ export function getIngredientsFromMealServingCountChange(mealPlan: IMealPlan, da
               recipeIngredientUpdated = true
               return {
                 ...ingredient,
-                quantity: quantity * newServingCount
+                quantity: quantity * newServingCount,
+                checkedState: ingredient.checkedState === CheckedState.CHECKED ? CheckedState.INVALIDATED : ingredient.checkedState
               }
             })
             .filter(ingredient => ingredient.quantity > 0)

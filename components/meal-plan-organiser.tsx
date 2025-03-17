@@ -17,6 +17,7 @@ import { Badge } from "./ui/badge"
 import { INutrition } from "@/types/INutrition"
 import { MealPlanDateNoteDialog } from "@/components/meal-plan-date-note-dialog"
 import { IShoppingIngredient } from "@/types/IShoppingIngredient"
+import { CheckedState } from "@/types/enums/CheckedState"
 
 interface Props {
     mealPlan: IMealPlan
@@ -58,7 +59,7 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
     }
     
     let shoppingIngredients = [...mealPlan.shoppingIngredients]
-        .filter(({ isChecked }) => isChecked)
+        .filter(({ checkedState }) => checkedState === CheckedState.CHECKED)
         .sort((a, b) => (a.expiryDate || 0) - (b.expiryDate || 0))
 
     let mealDates: { 

@@ -17,6 +17,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { IIngredientType } from "@/types/IIngredientType"
 import { DatePicker } from "@/components/date-picker"
 import { mealPlanShoppingListItemUpdated } from "@/app/reducers/mealPlansSlice"
+import { CheckedState } from "@/types/enums/CheckedState"
 
 interface Props {
     mealPlan: IMealPlan
@@ -81,32 +82,41 @@ export function MealPlanShoppingList({ mealPlan, label }: Props) {
                             {ingredientGroups.map(group => (
                                 <li key={group.type} className="mb-2 border-b pb-6 last:border-b-0 last:pb-0">
                                     <div className="font-bold mb-2">{group.type}</div>
-                                    <ul className="flex flex-col gap-2 px-3">
+                                    <ul className="flex flex-col gap-2 px-1">
                                         {group.ingredients.map(shoppingIngredient => {
-                                            const { id, ingredient, isChecked, expiryDate, quantity } = shoppingIngredient
+                                            const { id, ingredient, checkedState, expiryDate, quantity } = shoppingIngredient
                                             const { name } = ingredient
-
-                                            const quantityChanged = false // TODO - implement?
 
                                             return (
                                                 <li key={id} className="flex items-start gap-2">
                                                     <Checkbox 
                                                         id={id}
-                                                        checked={isChecked} 
+                                                        checked={[CheckedState.CHECKED, CheckedState.INVALIDATED].includes(checkedState)} 
                                                         onClick={() => {
+                                                            let newCheckedState = checkedState
+                                                            switch (checkedState) {
+                                                                case CheckedState.UNCHECKED:
+                                                                case CheckedState.INVALIDATED:
+                                                                    newCheckedState = CheckedState.CHECKED
+                                                                    break;
+                                                                case CheckedState.CHECKED:
+                                                                    newCheckedState = CheckedState.UNCHECKED
+                                                                    break;
+                                                            }
+
                                                             dispatch(mealPlanShoppingListItemUpdated({
                                                                 mealPlanId: mealPlan.id,
                                                                 shoppingIngredient: {
                                                                     ...shoppingIngredient,
-                                                                    isChecked: !isChecked
+                                                                    checkedState: newCheckedState
                                                                 }
                                                             }))
                                                         }}
-                                                        className={`mt-2.5 ${quantityChanged ? "opacity-25" : ""}`}
+                                                        className={`mt-2.5 ${checkedState === CheckedState.INVALIDATED ? "opacity-25" : ""}`}
                                                     />
                                                     <label htmlFor={id} className="mt-1.5 grow">{name}</label>
                                                     <div className="ml-auto flex items-center gap-4">
-                                                        <div className={`${isChecked ? "" : "opacity-0 pointer-events-none"}`}>
+                                                        <div className={`${checkedState !== CheckedState.UNCHECKED ? "" : "opacity-0 pointer-events-none"}`}>
                                                             <DatePicker
                                                                 originalDate={expiryDate ? new Date(expiryDate) : undefined}
                                                                 onSave={date => {
@@ -122,7 +132,7 @@ export function MealPlanShoppingList({ mealPlan, label }: Props) {
                                                                 dateDisplayFormat="LLL dd"
                                                             />
                                                         </div>
-                                                        <div>{quantity}g</div>
+                                                        <div className="font-mono">{quantity}g</div>
                                                     </div>
                                                 </li>
                                             )

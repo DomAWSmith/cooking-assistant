@@ -20,6 +20,8 @@ import { ReactNode } from "react"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { mealPlanAdded } from "@/app/reducers/mealPlansSlice"
 import { addDays, nextMonday, startOfYesterday } from "date-fns"
+import { generateId } from "@/lib/utils"
+import { useRouter } from "next/navigation"
 
 interface Props {
     children: ReactNode
@@ -30,16 +32,22 @@ interface Props {
 export default function MealPlanSidebar({ children, breadcrumbs, showMobileAddNew }: Props) {
     const mealPlans = useAppSelector(state => state.mealPlans)
     const dispatch = useAppDispatch()
+    const router = useRouter()
 
     const createNew = () => {
         const yesterday = startOfYesterday()
         const startDate = nextMonday(yesterday)
 
+        const id = generateId()
+
         dispatch(mealPlanAdded({
+            id,
             title: "",
             startDate: startDate.getTime(),
             endDate: addDays(startDate, 6).getTime(),
         }))
+
+        router.push(`/meal-plans/${id}`)
     }
     
     return (

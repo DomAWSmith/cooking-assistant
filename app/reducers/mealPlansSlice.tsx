@@ -104,7 +104,7 @@ const mealPlansSlice = createSlice({
     name: "mealPlans",
     initialState,
     reducers: {
-        mealPlanAdded: (state, { payload }: PayloadAction<Omit<IMealPlan, "id" | "dates" | "shoppingIngredients">>) => {
+        mealPlanAdded: (state, { payload }: PayloadAction<Omit<IMealPlan, "dates" | "shoppingIngredients">>) => {
             const { startDate, endDate } = payload
 
             let dates: IMealPlanDate[] = []
@@ -122,7 +122,6 @@ const mealPlansSlice = createSlice({
 
             state.push({
                 ...payload,
-                id: generateId(),
                 startDate,
                 endDate,
                 dates,

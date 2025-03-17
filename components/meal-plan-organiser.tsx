@@ -6,7 +6,7 @@ import { useState } from "react"
 import { RecipesPickerDialog } from "./recipes-picker-dialog"
 import { Button } from "./ui/button"
 import { Flame, Plus } from "lucide-react"
-import { formatNutritionNumber, generateId, getDateFromDateId, getDateId, getRecipeNutritionByServing, weekDayFormatter } from "@/lib/utils"
+import { formatNutritionNumber, generateId, generateShoppingIngredientsForMeals, getDateFromDateId, getDateId, getRecipeNutritionByServing, weekDayFormatter } from "@/lib/utils"
 import { Macros } from "./macros"
 import { addDays, isToday } from "date-fns"
 import { IMealPlan } from "@/types/IMealPlan"
@@ -58,6 +58,7 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
     }
     
     let shoppingIngredients = [...mealPlan.shoppingIngredients]
+        .filter(({ isChecked }) => isChecked)
         .sort((a, b) => (a.expiryDate || 0) - (b.expiryDate || 0))
 
     let mealDates: { 
@@ -120,10 +121,9 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                     if (recipeIngredientQtyReq === 0) return
 
                     availableIngredients.push({
-                        id: shoppingIngredientId,
+                        ...shoppingIngredient,
                         ingredientId: recipeIngredient.id,
                         quantity: ingredientQtyUsed,
-                        expiryDate: shoppingIngredient.expiryDate,
                     })
 
                     shoppingIngredients = shoppingIngredients.map(shoppingIngredient => {
@@ -169,14 +169,21 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                 onSave={(recipeIds) => {
                     if (selectingDateId === null) return
 
-                    dispatch(mealPlanDateMealsAdded({ 
-                        mealPlanId: mealPlan.id, 
-                        dateId: selectingDateId, 
-                        meals: recipeIds.map(recipeId => ({
+                    const meals = recipeIds
+                        .map(recipeId => ({
                             id: generateId(),
                             recipeId,
                             servingCount: 2, // TODO - make default configurable
                         }))
+
+                    dispatch(mealPlanDateMealsAdded({ 
+                        mealPlanId: mealPlan.id, 
+                        dateId: selectingDateId, 
+                        meals,
+                        shoppingIngredients: [
+                            ...mealPlan.shoppingIngredients,
+                            ...generateShoppingIngredientsForMeals(meals, recipes)
+                        ]
                     }))
                 }}
             />
@@ -223,7 +230,7 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
                                     {dateMeals.map(dateMeal => (
                                         <MealPlanOrganiserDragger 
                                             key={dateMeal.id} 
-                                            mealPlanId={mealPlan.id}
+                                            mealPlan={mealPlan}
                                             dateId={dateId}
                                             dateMeal={dateMeal}
                                             availableIngredients={dateMeal.availableIngredients}

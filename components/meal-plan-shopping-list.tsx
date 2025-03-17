@@ -16,7 +16,7 @@ import { IIngredient } from "@/types/IIngredient"
 import { Checkbox } from "@/components/ui/checkbox"
 import { IIngredientType } from "@/types/IIngredientType"
 import { DatePicker } from "@/components/date-picker"
-import { mealPlanShoppingListItemAdded, mealPlanShoppingListItemRemoved, mealPlanShoppingListItemExpiryDateSet } from "@/app/reducers/mealPlansSlice"
+import { mealPlanShoppingListItemUpdated } from "@/app/reducers/mealPlansSlice"
 
 interface Props {
     mealPlan: IMealPlan
@@ -35,45 +35,27 @@ interface IShoppingIngredientRequired extends IShoppingIngredient {
 export function MealPlanShoppingList({ mealPlan, label }: Props) {
     const dispatch = useAppDispatch()
 
-    const recipes = useAppSelector(state => state.recipes)
     const ingredients = useAppSelector(state => state.ingredients)
 
     const ingredientGroups: IShoppingIngredientGroup[] = []
+    mealPlan.shoppingIngredients.forEach(shoppingIngredient => {
+        const ingredient = ingredients.find(({ id }) => id === shoppingIngredient.ingredientId)
+        if (!ingredient) return
 
-    // TODO - use unique IDs
-    // build from mealplan.shoppingIngredients and then populate other required ingredients that don't exist with empty keys
-    // this should resolve ingredients getting messed up when moving meal plan meals around
+        const ingredientRequired = {
+            ...shoppingIngredient,
+            ingredient
+        }
 
-    const ingredientsRequired: IShoppingIngredientRequired[] = []
-    mealPlan.dates.forEach(date => {
-        date.meals.forEach(meal => {
-            const recipe = recipes.find(({ id }) => id === meal.recipeId)
-            if (!recipe) return
-
-            recipe.ingredients.forEach(recipeIngredient => {
-                const ingredient = ingredients.find(({ id }) => id === recipeIngredient.id)
-                if (!ingredient) return
-
-                const ingredientRequired = {
-                    id: `${date.id}-${meal.id}-${recipeIngredient.id}`,
-                    ingredientId: ingredient.id,
-                    quantity: recipeIngredient.quantity * meal.servingCount,
-                    ingredient
-                }
-
-                const ingredientGroupIndex = ingredientGroups.findIndex(group => group.type === ingredient.type)
-                if (ingredientGroupIndex === -1) {
-                    ingredientGroups.push({
-                        type: ingredient.type,
-                        ingredients: [ingredientRequired]
-                    })
-                } else {
-                    ingredientGroups[ingredientGroupIndex].ingredients.push(ingredientRequired)
-                }
-
-                ingredientsRequired.push()
+        const ingredientGroupIndex = ingredientGroups.findIndex(group => group.type === ingredient.type)
+        if (ingredientGroupIndex === -1) {
+            ingredientGroups.push({
+                type: ingredient.type,
+                ingredients: [ingredientRequired]
             })
-        })
+        } else {
+            ingredientGroups[ingredientGroupIndex].ingredients.push(ingredientRequired)
+        }
     })
 
     return (
@@ -100,18 +82,11 @@ export function MealPlanShoppingList({ mealPlan, label }: Props) {
                                 <li key={group.type} className="mb-2 border-b pb-6 last:border-b-0 last:pb-0">
                                     <div className="font-bold mb-2">{group.type}</div>
                                     <ul className="flex flex-col gap-2 px-3">
-                                        {group.ingredients.map(groupIngredient => {
-                                            const { id, ingredient, quantity } = groupIngredient
+                                        {group.ingredients.map(shoppingIngredient => {
+                                            const { id, ingredient, isChecked, expiryDate, quantity } = shoppingIngredient
                                             const { name } = ingredient
-                                            
-                                            const shoppingIngredient = mealPlan.shoppingIngredients.find(shoppingIngredient => shoppingIngredient.id === id)
-                                            
-                                            let isChecked = false
-                                            let quantityChanged = false
-                                            if (shoppingIngredient) {
-                                                isChecked = shoppingIngredient.quantity >= 0
-                                                quantityChanged = shoppingIngredient.quantity !== quantity // meal plan could change after checking an ingredient, so we'll indicate with a faded checkbox
-                                            }
+
+                                            const quantityChanged = false // TODO - implement?
 
                                             return (
                                                 <li key={id} className="flex items-start gap-2">
@@ -119,17 +94,13 @@ export function MealPlanShoppingList({ mealPlan, label }: Props) {
                                                         id={id}
                                                         checked={isChecked} 
                                                         onClick={() => {
-                                                            if (isChecked) {
-                                                                dispatch(mealPlanShoppingListItemRemoved({
-                                                                    mealPlanId: mealPlan.id,
-                                                                    shoppingListItemId: groupIngredient.id
-                                                                }))
-                                                            } else {
-                                                                dispatch(mealPlanShoppingListItemAdded({
-                                                                    mealPlanId: mealPlan.id,
-                                                                    shoppingIngredient: groupIngredient
-                                                                }))
-                                                            }
+                                                            dispatch(mealPlanShoppingListItemUpdated({
+                                                                mealPlanId: mealPlan.id,
+                                                                shoppingIngredient: {
+                                                                    ...shoppingIngredient,
+                                                                    isChecked: !isChecked
+                                                                }
+                                                            }))
                                                         }}
                                                         className={`mt-2.5 ${quantityChanged ? "opacity-25" : ""}`}
                                                     />
@@ -137,12 +108,14 @@ export function MealPlanShoppingList({ mealPlan, label }: Props) {
                                                     <div className="ml-auto flex items-center gap-4">
                                                         <div className={`${isChecked ? "" : "opacity-0 pointer-events-none"}`}>
                                                             <DatePicker
-                                                                originalDate={shoppingIngredient?.expiryDate ? new Date(shoppingIngredient.expiryDate) : undefined}
+                                                                originalDate={expiryDate ? new Date(expiryDate) : undefined}
                                                                 onSave={date => {
-                                                                    dispatch(mealPlanShoppingListItemExpiryDateSet({
+                                                                    dispatch(mealPlanShoppingListItemUpdated({
                                                                         mealPlanId: mealPlan.id,
-                                                                        shoppingListItemId: groupIngredient.id,
-                                                                        expiryDate: date ? date.getTime() : undefined
+                                                                        shoppingIngredient: {
+                                                                            ...shoppingIngredient,
+                                                                            expiryDate: date ? date.getTime() : undefined
+                                                                        }
                                                                     }))
                                                                 }}
                                                                 label="Set expiry"

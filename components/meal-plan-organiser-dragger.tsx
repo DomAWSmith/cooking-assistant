@@ -7,17 +7,19 @@ import { getRecipeNutritionByServing } from "@/lib/utils"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { mealPlanDateMealServingChanged } from "@/app/reducers/mealPlansSlice"
 import { IShoppingIngredient } from "@/types/IShoppingIngredient"
+import { IMealPlan } from "@/types/IMealPlan"
 
 interface Props {
-    mealPlanId: string
+    mealPlan: IMealPlan
     dateId: string
     dateMeal: IMealPlanDateMeal
     availableIngredients: IShoppingIngredient[]
 }
 
-export default function MealPlanOrganiserDragger({ mealPlanId, dateId, dateMeal, availableIngredients }: Props) {
+export default function MealPlanOrganiserDragger({ mealPlan, dateId, dateMeal, availableIngredients }: Props) {
     const dispatch = useAppDispatch()
 
+    const recipes = useAppSelector(state => state.recipes)
     const ingredients = useAppSelector(state => state.ingredients)
 
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
@@ -38,6 +40,56 @@ export default function MealPlanOrganiserDragger({ mealPlanId, dateId, dateMeal,
 
     const minServings = 0
     const maxServings = 100
+
+    const changeServingCount = (newServingCount: number) => {
+        // adjust unchecked items first 
+        // so items that have been checked are less likely to become "invalidated"
+        // e.g. user ticked that they have 10g of something which now needs to be 20g)
+        let newShoppingIngredients = [...mealPlan.shoppingIngredients]
+            .sort((a, b) => (a.isChecked === b.isChecked) ? 0 : a.isChecked ? 1 : -1)
+
+        mealPlan.dates.forEach(date => {
+            if (date.id !== dateId) return
+
+            date.meals.forEach(({ id, recipeId }) => {
+                if (id !== dateMeal.id) return
+                
+                const recipe = recipes.find(recipe => recipe.id === recipeId)
+                if (!recipe) return []
+
+                const oldServingCount = dateMeal.servingCount
+
+                // update shopping ingredients 
+                // by finding matching ingredients and changing their old quantity requirements to the new quantity requirements
+                recipe.ingredients
+                    .map(({ id: ingredientId, quantity }) => {
+                        let recipeIngredientUpdated = false
+
+                        newShoppingIngredients = newShoppingIngredients
+                            .map(ingredient => {
+                                if (ingredient.ingredientId !== ingredientId) return ingredient
+                                if (ingredient.quantity !== quantity * oldServingCount) return ingredient
+                                if (recipeIngredientUpdated) return ingredient
+
+                                recipeIngredientUpdated = true
+                                return {
+                                    ...ingredient,
+                                    quantity: quantity * newServingCount
+                                }
+                            })
+                            .filter(ingredient => ingredient.quantity > 0)
+                    })
+            })
+        })
+
+        dispatch(mealPlanDateMealServingChanged({
+            mealPlanId: mealPlan.id,
+            dateId,
+            mealId: dateMeal.id,
+            servingCount: newServingCount,
+            shoppingIngredients: newShoppingIngredients
+        }))
+    }
 
     return (
         <div
@@ -67,22 +119,8 @@ export default function MealPlanOrganiserDragger({ mealPlanId, dateId, dateMeal,
                                     count: servingCount,
                                     min: minServings,
                                     max: maxServings,
-                                    onDecrement: () => {
-                                        dispatch(mealPlanDateMealServingChanged({
-                                            mealPlanId,
-                                            dateId,
-                                            mealId: dateMeal.id,
-                                            servingCount: Math.max(servingCount - 1, minServings)
-                                        }))
-                                    },
-                                    onIncrement: () => {
-                                        dispatch(mealPlanDateMealServingChanged({
-                                            mealPlanId,
-                                            dateId,
-                                            mealId: dateMeal.id,
-                                            servingCount: Math.min(servingCount + 1, maxServings)
-                                        }))
-                                    }
+                                    onDecrement: () => changeServingCount(Math.max(servingCount - 1, minServings)),
+                                    onIncrement: () => changeServingCount(Math.min(servingCount + 1, maxServings))
                                 }
                             }}
                         />

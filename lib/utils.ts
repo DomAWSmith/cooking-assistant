@@ -6,6 +6,8 @@ import { IMealPlan } from "@/types/IMealPlan"
 import { INutrition } from "@/types/INutrition"
 import { IRecipe } from "@/types/IRecipe"
 import { IIngredient } from "@/types/IIngredient"
+import { IMealPlanDateMeal } from "@/types/IMealPlanDateMeal"
+import { IShoppingIngredient } from "@/types/IShoppingIngredient"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -138,7 +140,7 @@ export function getMealPlanTitle(mealPlan: IMealPlan) {
   return dateFormatter.formatRange(mealPlan.startDate, mealPlan.endDate)
 }
 
-export const weekDayFormatter = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric" })
+export const weekDayFormatter = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric" })
 
 export function getMealPlanCounts(mealPlan: IMealPlan, recipes: IRecipe[]) {
   let mealCount = 0
@@ -155,11 +157,30 @@ export function getMealPlanCounts(mealPlan: IMealPlan, recipes: IRecipe[]) {
   })
 
   const currentIngredientCount = mealPlan.shoppingIngredients
-    .reduce((prev, curr) => prev + (curr.quantity > 0 ? 1 : 0), 0)
+    .filter(({ isChecked }) => isChecked)
+    .length
 
   return {
     mealCount,
     currentIngredientCount,
     totalIngredientCount
   }
+}
+
+export function generateShoppingIngredientsForMeals(meals: IMealPlanDateMeal[], recipes: IRecipe[]): IShoppingIngredient[] {
+  return meals
+    .reduce((prev, { recipeId, servingCount }) => {
+      const recipe = recipes.find(recipe => recipe.id === recipeId)
+      if (!recipe) return prev as IShoppingIngredient[]
+
+      const mealIngredients: IShoppingIngredient[] = recipe.ingredients
+        .map(({ id: ingredientId, quantity }) => ({
+          id: generateId(),
+          ingredientId,
+          isChecked: false,
+          quantity: quantity * servingCount
+        }))
+      
+      return [...prev, ...mealIngredients]
+    }, [] as IShoppingIngredient[])
 }

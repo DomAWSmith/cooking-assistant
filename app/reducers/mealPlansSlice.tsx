@@ -21,84 +21,7 @@ nextWeek.setHours(0, 0, 0, 0)
 const nextMonth = addDays(new Date(), 30)
 nextMonth.setHours(0, 0, 0, 0)
 
-// const initialState: IMealPlan[] = []
-const initialState: IMealPlan[] = [
-    {
-        id: '80c06901-d752-433c-9f36-33699dc27320',
-        title: '',
-        startDate: 1742169600000,
-        endDate: 1742688000000,
-        dates: [
-            {
-                id: '17-2-2025',
-                meals: []
-            },
-            {
-                id: '18-2-2025',
-                meals: []
-            },
-            {
-                id: '19-2-2025',
-                meals: []
-            },
-            {
-                id: '20-2-2025',
-                meals: []
-            },
-            {
-                id: '21-2-2025',
-                meals: []
-            },
-            {
-                id: '22-2-2025',
-                meals: []
-            },
-            {
-                id: '23-2-2025',
-                meals: []
-            }
-        ],
-        shoppingIngredients: []
-    },
-    {
-        id: '9e22458e-d5ca-4e84-b0f0-3fe7f6f479b5',
-        title: '',
-        startDate: 1742860800000,
-        endDate: 1743033600000,
-        dates: [
-            {
-                id: '25-2-2025',
-                meals: [
-                    {
-                        id: '1db97244-d780-4c10-b5cb-ed108c38ccd6',
-                        recipeId: '1',
-                        servingCount: 2
-                    },
-                    {
-                        id: '3632d5a2-1f8a-482f-aef8-e6124bf34760',
-                        recipeId: '1',
-                        servingCount: 2
-                    }
-                ]
-            },
-            {
-                id: '26-2-2025',
-                meals: [
-                    {
-                        id: '2991bbdb-afd5-48d5-bb4d-e5c19d1530a4',
-                        recipeId: '1',
-                        servingCount: 2
-                    }
-                ]
-            },
-            {
-                id: '27-2-2025',
-                meals: []
-            }
-        ],
-        shoppingIngredients: []
-    }
-] // TODO: use real data
+const initialState: IMealPlan[] = [] // TODO: use real data
 
 const mealPlansSlice = createSlice({
     name: "mealPlans",
@@ -135,7 +58,8 @@ const mealPlansSlice = createSlice({
             } : mealPlan)
         },
         mealPlanDateRangeChanged: (state, { payload: { mealPlanId, startDate, endDate } }: PayloadAction<{ mealPlanId: string, startDate: number, endDate: number }>) => {
-            // TODO - update shoppingIngredients            
+            // TODO - move meals from dates outside of range to last new date inside range
+
             return state.map(mealPlan => {
                 if (mealPlan.id !== mealPlanId) return mealPlan
                 
@@ -165,9 +89,7 @@ const mealPlansSlice = createSlice({
                 }
             })
         },
-        mealPlanDateMealsAdded: (state, { payload: { mealPlanId, dateId, meals } }: PayloadAction<{ mealPlanId: string, dateId: string, meals: IMealPlanDateMeal[] }>) => {
-            // TODO - add to shopping list, each item should have association with a mealPlanDateMealId
-
+        mealPlanDateMealsAdded: (state, { payload: { mealPlanId, dateId, meals, shoppingIngredients } }: PayloadAction<{ mealPlanId: string, dateId: string, meals: IMealPlanDateMeal[], shoppingIngredients: IShoppingIngredient[] }>) => {
             return state.map(mealPlan => {
                 if (mealPlan.id !== mealPlanId) return mealPlan
 
@@ -176,13 +98,12 @@ const mealPlansSlice = createSlice({
                     dates: mealPlan.dates.map(date => date.id === dateId ? {
                         ...date,
                         meals: [...date.meals, ...meals]
-                    } : date)
+                    } : date),
+                    shoppingIngredients
                 }
             })
         },
         mealPlanDateMealsMoved: (state, { payload: { mealPlanId, oldDateId, newDateId, meal } }: PayloadAction<{ mealPlanId: string, oldDateId: string, newDateId: string, meal: IMealPlanDateMeal }>) => {
-            // TODO - consider shopping items that are marked has checked, that may now have incorrect quantities
-
             return state.map(mealPlan => {
                 if (mealPlan.id !== mealPlanId) return mealPlan
 
@@ -218,71 +139,62 @@ const mealPlansSlice = createSlice({
                     } : date)
                 }
             })
-
         },
-        mealPlanDateMealServingChanged: (state, { payload: { mealPlanId, dateId, mealId, servingCount } }: PayloadAction<{ mealPlanId: string, dateId: string, mealId: string, servingCount: number }>) => {
-            // TODO - when a meal is removed
-            // remove any ingredients that are no longer needed (consider other meals might need the ones this meal was using)
-
-            if (servingCount <= 0) {
-                return state.map(mealPlan => mealPlan.id === mealPlanId ? {
-                    ...mealPlan,
-                    dates: mealPlan.dates.map(date => date.id === dateId ? {
-                        ...date,
-                        meals: date.meals.filter(meal => meal.id !== mealId)
-                    } : date),
-                } : mealPlan)
-            }
-
-            return state.map(mealPlan => mealPlan.id === mealPlanId ? {
-                ...mealPlan,
-                dates: mealPlan.dates.map(date => date.id === dateId ? {
-                    ...date,
-                    meals: date.meals.map(meal => meal.id === mealId ? {
-                        ...meal,
-                        servingCount
-                    } : meal)
-                } : date),
-            } : mealPlan)
-        },
-        mealPlanShoppingListItemAdded: (state, { payload: { mealPlanId, shoppingIngredient } }: PayloadAction<{ mealPlanId: string, shoppingIngredient: IShoppingIngredient }>) => {
+        mealPlanDateMealServingChanged: (state, { payload: { mealPlanId, dateId, mealId, servingCount, shoppingIngredients } }: PayloadAction<{ mealPlanId: string, dateId: string, mealId: string, servingCount: number, shoppingIngredients: IShoppingIngredient[] }>) => {
             return state.map(mealPlan => {
                 if (mealPlan.id !== mealPlanId) return mealPlan
-
-                return {
-                    ...mealPlan,
-                    shoppingIngredients: [...mealPlan.shoppingIngredients, shoppingIngredient]
-                }
-            })
-        },
-        mealPlanShoppingListItemRemoved: (state, { payload: { mealPlanId, shoppingListItemId } }: PayloadAction<{ mealPlanId: string, shoppingListItemId: string }>) => {
-            return state.map(mealPlan => {
-                if (mealPlan.id !== mealPlanId) return mealPlan
-
-                return {
-                    ...mealPlan,
-                    shoppingIngredients: mealPlan.shoppingIngredients.filter(shoppingIngredient => shoppingIngredient.id !== shoppingListItemId)
-                }
-            })
-        },
-        mealPlanShoppingListItemExpiryDateSet: (state, { payload: { mealPlanId, shoppingListItemId, expiryDate } }: PayloadAction<{ mealPlanId: string, shoppingListItemId: string, expiryDate?: number }>) => {
-            return state.map(mealPlan => {
-                if (mealPlan.id !== mealPlanId) return mealPlan
-
-                return {
-                    ...mealPlan,
-                    shoppingIngredients: mealPlan.shoppingIngredients.map(shoppingIngredient => {
-                        if (shoppingIngredient.id !== shoppingListItemId) return shoppingIngredient
+                
+                let newDates: IMealPlanDate[] = []     
+                if (servingCount > 0) {
+                    // update meal
+                    newDates = mealPlan.dates.map(date => {
+                        if (date.id !== dateId) return date
 
                         return {
-                            ...shoppingIngredient,
-                            expiryDate,
-                        }
+                            ...date,
+                            meals: date.meals.map(meal => {
+                                if (meal.id !== mealId) return meal
 
+                                return {
+                                    ...meal,
+                                    servingCount
+                                }
+                            })
+                        }
+                    })
+                } else {
+                    // remove meal
+                    newDates = mealPlan.dates.map(date => {
+                        if (date.id !== dateId) return date
+
+                        return {
+                            ...date,
+                            meals: date.meals.filter(meal => meal.id !== mealId)
+                        }
+                    })
+                }
+
+                return {
+                    ...mealPlan,
+                    dates: newDates,
+                    shoppingIngredients
+                }
+            })
+        },
+        mealPlanShoppingListItemUpdated: (state, { payload: { mealPlanId, shoppingIngredient } }: PayloadAction<{ mealPlanId: string, shoppingIngredient: IShoppingIngredient }>) => {
+            return state.map(mealPlan => {
+                if (mealPlan.id !== mealPlanId) return mealPlan
+
+                return {
+                    ...mealPlan,
+                    shoppingIngredients: mealPlan.shoppingIngredients.map(ingredient => {
+                        if (ingredient.id !== shoppingIngredient.id) return ingredient
+
+                        return shoppingIngredient
                     })
                 }
             })
-        }
+        },
     }
 })
 
@@ -294,8 +206,6 @@ export const {
     mealPlanDateMealsMoved,
     mealPlanDateNoteChanged, 
     mealPlanDateMealServingChanged, 
-    mealPlanShoppingListItemAdded, 
-    mealPlanShoppingListItemRemoved, 
-    mealPlanShoppingListItemExpiryDateSet 
+    mealPlanShoppingListItemUpdated,
 } = mealPlansSlice.actions
 export default mealPlansSlice.reducer

@@ -21,7 +21,8 @@ export function Recipe({ recipe, mealData }: Props) {
   const nutrition = getRecipeNutritionByServing(recipe, ingredients, mealData?.serving?.count || 1)
 
   if (mealData) {
-    const { serving, availableIngredients } = mealData
+    const { serving, availableIngredients, dateId } = mealData
+    const date = getDateFromDateId(dateId)
 
     let ingredientAlerts: { id: string, name: string, message: string }[] = []
 
@@ -55,10 +56,7 @@ export function Recipe({ recipe, mealData }: Props) {
         return
       }
 
-      const date = getDateFromDateId(mealData.dateId)
-      availableIngredients.forEach(availableIngredient => {
-        if (!availableIngredient.expiryDate) return
-        if (!availableIngredient.quantity) return
+      if (availableIngredient.expiryDate) {
         if (availableIngredient.expiryDate >= date.getTime()) return
 
         ingredientAlerts.push({
@@ -66,7 +64,7 @@ export function Recipe({ recipe, mealData }: Props) {
           name: ingredient.name,
           message: `expires on ${weekDayFormatter.format(availableIngredient.expiryDate)}`
         })
-      })
+      }
     })
 
     return (

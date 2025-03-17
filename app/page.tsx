@@ -1,6 +1,6 @@
 "use client"
 
-import { useAppSelector } from "@/lib/hooks"
+import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 
 import { AppSidebar } from "@/components/app-sidebar"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb"
@@ -12,9 +12,14 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { generateWelcomeMessage } from "@/lib/chef"
 import { getClosestUpcomingMealPlan } from "@/lib/utils"
+import { useRouter } from "next/navigation"
 
 export default function MealPlans() {
+  const dispatch = useAppDispatch()
+  const router = useRouter()
+
   const mealPlans = useAppSelector(state => state.mealPlans)
   const recipes = useAppSelector(state => state.recipes)
 
@@ -39,11 +44,8 @@ export default function MealPlans() {
             </BreadcrumbList>
           </Breadcrumb>
         </header>
-        <div className="flex h-full w-full items-center justify-center p-4">
-          <Chef 
-            hasRecipes={recipes.length > 0}
-            nextMealPlan={getClosestUpcomingMealPlan(mealPlans)} 
-          />
+        <div className="flex h-full w-full items-center justify-center p-4 text-lg">
+          <Chef {...generateWelcomeMessage(recipes.length > 0, getClosestUpcomingMealPlan(mealPlans), router, dispatch)} />
         </div>
       </SidebarInset>
     </SidebarProvider>

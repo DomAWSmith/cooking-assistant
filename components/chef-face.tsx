@@ -5,7 +5,7 @@ interface Props {
 export default function ChefFace({ className }: Props) {
     return (
         <div className={`${className} relative`}>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 311.35 475.91" height="200px" className="chef -ml-4.5 relative z-10">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 311.35 475.91" height="10em" width="10em" className="chef -ml-4.5 relative z-10 text-center">
                 <circle cx="178.35" cy="342.91" r="127" className="fill-white stroke-black stroke-[8px]" strokeLinecap="round" strokeLinejoin="round" />
                 <path className="moustache animate-wiggle origin-[55%_65%] stroke-black fill-black" strokeLinecap="round" strokeLinejoin="round" strokeWidth="8" d="M250.78 388.78s-21.08 21.13-72.45 21.13-73.42-21.13-73.42-21.13c13.65-23.95 37.42-39.37 72.94-39.37s59.28 15.42 72.93 39.37z" />
                 <path d="M153.65 335.91a30.59 30.59 0 0 0-7.3 19.83c0 17.21 14.32 31.17 32 31.17s32-14 32-31.17a30.54 30.54 0 0 0-7-19.49" className="fill-white stroke-black stroke-[8px]" strokeLinecap="round" strokeLinejoin="round" />

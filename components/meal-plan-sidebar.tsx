@@ -18,10 +18,8 @@ import { MealPlans } from "@/components/meal-plans"
 
 import { ReactNode } from "react"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
-import { mealPlanAdded } from "@/app/reducers/mealPlansSlice"
-import { addDays, nextMonday, startOfYesterday } from "date-fns"
-import { generateId } from "@/lib/utils"
 import { useRouter } from "next/navigation"
+import { createMealPlan } from "@/lib/meal-plan"
 
 interface Props {
     children: ReactNode
@@ -34,21 +32,7 @@ export default function MealPlanSidebar({ children, breadcrumbs, showMobileAddNe
     const dispatch = useAppDispatch()
     const router = useRouter()
 
-    const createNew = () => {
-        const yesterday = startOfYesterday()
-        const startDate = nextMonday(yesterday)
-
-        const id = generateId()
-
-        dispatch(mealPlanAdded({
-            id,
-            title: "",
-            startDate: startDate.getTime(),
-            endDate: addDays(startDate, 6).getTime(),
-        }))
-
-        router.push(`/meal-plans/${id}`)
-    }
+    const createNew = () => createMealPlan(dispatch, router)
     
     return (
         <SidebarProvider

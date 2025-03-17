@@ -18,6 +18,7 @@ import { IIngredientType } from "@/types/IIngredientType"
 import { DatePicker } from "@/components/date-picker"
 import { mealPlanShoppingListItemUpdated } from "@/app/reducers/mealPlansSlice"
 import { CheckedState } from "@/types/enums/CheckedState"
+import Chef from "@/components/chef"
 
 interface Props {
     mealPlan: IMealPlan
@@ -71,7 +72,7 @@ export function MealPlanShoppingList({ mealPlan, label }: Props) {
                 <DialogHeader>
                     <DialogTitle>Shopping list</DialogTitle>
                     <DialogDescription>
-                        Entering expiry dates will ensure you use ingredients in time
+                        We'll alert you if any expiry dates will be an issue
                     </DialogDescription>
                 </DialogHeader>
 
@@ -144,7 +145,9 @@ export function MealPlanShoppingList({ mealPlan, label }: Props) {
 
                         </ul>
                     ) : (
-                        <div className="text-center py-4">No ingredients required</div>
+                        <div className="text-center p-12">
+                            <Chef message="No ingredients needed,<br/> add some meals to get started" />
+                        </div>
                     )}
                 </ScrollArea>
             </DialogContent>

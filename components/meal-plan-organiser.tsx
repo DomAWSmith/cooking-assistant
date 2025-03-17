@@ -60,7 +60,14 @@ export default function MealPlanOrganiser({ mealPlan, recipes }: Props) {
     
     let shoppingIngredients = [...mealPlan.shoppingIngredients]
         .filter(({ checkedState }) => checkedState === CheckedState.CHECKED)
-        .sort((a, b) => (a.expiryDate || 0) - (b.expiryDate || 0))
+        .sort((a, b) => {
+            if (a.expiryDate === b.expiryDate) return 0
+
+            if (!a.expiryDate) return 1
+            if (!b.expiryDate) return -1
+
+            return a.expiryDate - b.expiryDate
+        })
 
     let mealDates: { 
         date: Date, 

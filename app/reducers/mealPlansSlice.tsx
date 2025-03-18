@@ -57,6 +57,9 @@ const mealPlansSlice = createSlice({
                 title,
             } : mealPlan)
         },
+        mealPlanDeleted: (state, { payload: { mealPlanId } }: PayloadAction<{ mealPlanId: string }>) => {
+            return state.filter(mealPlan => mealPlan.id !== mealPlanId)
+        },
         mealPlanDateRangeChanged: (state, { payload: { mealPlanId, startDate, endDate, shoppingIngredients } }: PayloadAction<{ mealPlanId: string, startDate: number, endDate: number, shoppingIngredients: IShoppingIngredient[] }>) => {
             return state.map(mealPlan => {
                 if (mealPlan.id !== mealPlanId) return mealPlan
@@ -199,7 +202,8 @@ const mealPlansSlice = createSlice({
 
 export const { 
     mealPlanAdded, 
-    mealPlanRenamed, 
+    mealPlanRenamed,
+    mealPlanDeleted, 
     mealPlanDateRangeChanged, 
     mealPlanDateMealsAdded,
     mealPlanDateMealsMoved,

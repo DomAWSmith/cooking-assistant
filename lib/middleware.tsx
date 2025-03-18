@@ -3,6 +3,7 @@ import { RootState } from "@/lib/store"
 import {
     mealPlanAdded,
     mealPlanRenamed,
+    mealPlanDeleted,
     mealPlanDateRangeChanged,
     mealPlanDateMealsAdded,
     mealPlanDateMealsMoved,
@@ -17,6 +18,7 @@ listenerMiddleware.startListening({
     matcher: isAnyOf(
         mealPlanAdded,
         mealPlanRenamed,
+        mealPlanDeleted,
         mealPlanDateRangeChanged,
         mealPlanDateMealsAdded,
         mealPlanDateMealsMoved,

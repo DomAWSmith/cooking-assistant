@@ -10,6 +10,7 @@ import { mealPlanDateRangeChanged, mealPlanRenamed } from "@/app/reducers/mealPl
 import MealPlanOrganiser from "@/components/meal-plan-organiser"
 import { MealPlanShoppingList } from "@/components/meal-plan-shopping-list"
 import { getDateFromDateId, getIngredientsFromMealServingCountChange, getMealPlanCounts, getMealPlanTitle } from "@/lib/utils"
+import MealPlanDelete from "@/components/meal-plan-delete"
 
 export default function Page() {
   const { id } = useParams<{ id: string }>()
@@ -79,6 +80,10 @@ export default function Page() {
             mealPlan={mealPlan}
             recipes={recipes}
           />
+        </div>
+
+        <div className="p-4 pt-12 mt-auto flex justify-end">
+          <MealPlanDelete mealPlan={mealPlan} />
         </div>
       </>
     )

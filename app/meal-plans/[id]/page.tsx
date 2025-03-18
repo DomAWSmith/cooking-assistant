@@ -11,6 +11,7 @@ import MealPlanOrganiser from "@/components/meal-plan-organiser"
 import { MealPlanShoppingList } from "@/components/meal-plan-shopping-list"
 import { getDateFromDateId, getIngredientsFromMealServingCountChange, getMealPlanCounts, getMealPlanTitle } from "@/lib/utils"
 import MealPlanDelete from "@/components/meal-plan-delete"
+import toast from "react-hot-toast"
 
 export default function Page() {
   const { id } = useParams<{ id: string }>()
@@ -103,6 +104,8 @@ export default function Page() {
                 originalTitle={pageName}
                 onSave={(title) => {
                   dispatch(mealPlanRenamed({ mealPlanId: id, title }))
+
+                  toast.success(`Renamed meal plan to "${title}"`)
                 }}
               />
             </BreadcrumbPage>

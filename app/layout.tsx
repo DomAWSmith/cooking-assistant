@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import StoreProvider from "./StoreProvider";
 import ClientPreferences from "@/components/client-preferences";
+import { Toaster } from "react-hot-toast"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,6 +33,9 @@ export default function RootLayout({
         <StoreProvider>
           <ClientPreferences>
             {children}
+            <Toaster
+              position="bottom-center"
+            />
           </ClientPreferences>
         </StoreProvider>
       </body>

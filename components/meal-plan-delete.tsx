@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Ban, Trash2 } from "lucide-react"
+import toast from "react-hot-toast"
 
 import Dialog from "@/components/dialog"
 import { DialogDescription } from "@/components/ui/dialog"
@@ -22,6 +23,8 @@ export default function MealPlanDelete({
     const dispatch = useAppDispatch()
     const router = useRouter()
 
+    const mealPlanTitle = getMealPlanTitle(mealPlan)
+
     return (
         <Dialog
             isOpen={isOpen}
@@ -32,7 +35,7 @@ export default function MealPlanDelete({
                     <span>Delete meal plan</span>
                 </Button>
             )}
-            title={`Delete meal plan "${getMealPlanTitle(mealPlan)}"?`}
+            title={`Delete meal plan "${mealPlanTitle}"?`}
         >
             <DialogDescription>Are you sure?</DialogDescription>
             <div className="grid grid-cols-2 gap-2 pt-4">
@@ -47,6 +50,7 @@ export default function MealPlanDelete({
                 <Button 
                     onClick={() => {
                         dispatch(mealPlanDeleted({ mealPlanId: mealPlan.id }))
+                        toast.success(`${mealPlanTitle} deleted`)
                         router.push(`/meal-plans`)
                     }}
                     className="w-full" 
